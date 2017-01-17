@@ -1,4 +1,5 @@
 node_modules
 config/_private.conf.json
+test/config/_private.conf.json
 npm-debug.log
 npm-debug.log.*

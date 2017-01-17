@@ -1,0 +1,10 @@
+{
+    "context": {
+        "siteUrl": "https://contoso.sharepoint.com",
+        "username": "username",
+        "password": ""
+    },
+    "data": {
+        "accountName": "i:0#.f|membership|username"
+    }
+}
