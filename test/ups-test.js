@@ -19,7 +19,7 @@ var getUserProfileByName = function() {
 
     var data = {
         baseUrl: context.siteUrl,
-        accountName: config.data.accountName
+        accountName: config.ups.accountName
     };
 
     screw.ups.getUserProfileByName(data)
@@ -41,7 +41,7 @@ var modifyUserPropertyByAccountName = function() {
 
     var data = {
         baseUrl: context.siteUrl,
-        accountName: config.data.accountName,
+        accountName: config.ups.accountName,
         newData: [{
             isPrivacyChanged: false,
             isValueChanged: true,
@@ -74,7 +74,7 @@ var getUserPropertyByAccountName = function() {
 
     var data = {
         baseUrl: context.siteUrl,
-        accountName: config.data.accountName,
+        accountName: config.ups.accountName,
         propertyName: 'SPS-Birthday'
     };
 
@@ -97,7 +97,7 @@ var getUserProfilePropertyFor = function() {
 
     var data = {
         baseUrl: context.siteUrl,
-        accountName: config.data.accountName,
+        accountName: config.ups.accountName,
         propertyName: 'SPS-Birthday'
     };
 
@@ -118,7 +118,7 @@ var getPropertiesFor = function() {
 
     var data = {
         baseUrl: context.siteUrl,
-        accountName: config.data.accountName
+        accountName: config.ups.accountName
     };
 
     screw.ups.getPropertiesFor(data)

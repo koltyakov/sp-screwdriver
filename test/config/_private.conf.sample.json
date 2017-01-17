@@ -4,7 +4,13 @@
         "username": "username",
         "password": ""
     },
-    "data": {
+    "ups": {
         "accountName": "i:0#.f|membership|username"
+    },
+    "mmd": {
+        "sspId": "ffca190d3d644312ad74dc2c05fd27fc",
+        "termSetId": "8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f",
+        "termId": "e66280de-4fdd-4cb9-8783-ce3efe3f7ef8",
+        "lcid": 1033
     }
 }
