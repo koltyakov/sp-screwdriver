@@ -7,7 +7,7 @@
 [![npm version](https://badge.fury.io/js/sp-screwdriver.svg)](https://badge.fury.io/js/sp-screwdriver)
 [![Downloads](https://img.shields.io/npm/dm/sp-screwdriver.svg)](https://www.npmjs.com/package/sp-screwdriver)
 
-![logo](https://github.com/koltyakov/sp-screwdriver/blob/master/doc/img/screwdriver-logo.png)
+![logo](https://github.com/koltyakov/sp-screwdriver/blob/master/doc/img/screwdriver-logo.png?raw=true)
 
 > Adds missing and abstracts SharePoint APIs for transparent usage in Node.js applications
 
