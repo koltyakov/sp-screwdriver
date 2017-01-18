@@ -8,6 +8,6 @@
 
 ## APIs
 
-### Manage Metadata Service API (Taxonomy)
+### Manage Metadata Service (Taxonomy)
 
-### User Profiles Service API
+### User Profiles Service

@@ -182,3 +182,25 @@ var addTerms = function() {
 
 };
 // addTerms();
+
+// ================================
+
+var getAllTerms = function() {
+
+    var data = {
+        baseUrl: context.siteUrl,
+        serviceName: config.mmd.serviceName,
+        termSetId: config.mmd.termSetId
+    };
+
+    screw.mmd.getAllTerms(data)
+        .then(function(response) {
+            var results = JSON.parse(response.body);
+            console.log("Response:", results[results.length - 1]['_Child_Items_']);
+        })
+        .catch(function(err) {
+            console.log('Error:', err.message);
+        });
+
+};
+// getAllTerms();
