@@ -2,7 +2,7 @@
 
 > Beta | Not for production
 
-![logo](https://github.com/koltyakov/sp-screwdriver/blob/master/doc/img/logo.png)
+![logo](https://github.com/koltyakov/sp-screwdriver/blob/master/doc/img/screwdriver-logo.png)
 
 > Adds missing and abstracts SharePoint APIs for transparent usage in Node.js applications
 
