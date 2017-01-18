@@ -214,7 +214,7 @@ var setTermName = function() {
         serviceName: config.mmd.serviceName,
         termSetId: config.mmd.termSetId,
         termId: "f3b7eb21-ba15-40f1-a872-93c48f6530a2",
-        newName: "Bla bla bla 434343"
+        newName: "New name"
     };
 
     screw.mmd.setTermName(data)
@@ -227,4 +227,28 @@ var setTermName = function() {
         });
 
 };
-setTermName();
+// setTermName();
+
+// ================================
+
+var deprecateTerm = function() {
+
+    var data = {
+        baseUrl: context.siteUrl,
+        serviceName: config.mmd.serviceName,
+        termSetId: config.mmd.termSetId,
+        termId: "f3b7eb21-ba15-40f1-a872-93c48f6530a2",
+        deprecate: true
+    };
+
+    screw.mmd.deprecateTerm(data)
+        .then(function(response) {
+            // var results = JSON.parse(response.body);
+            console.log("Response:", response.body);
+        })
+        .catch(function(err) {
+            console.log('Error:', err.message);
+        });
+
+};
+// deprecateTerm();

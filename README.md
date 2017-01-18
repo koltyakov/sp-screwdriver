@@ -40,3 +40,4 @@ This library implements (or at least tries) some vital capabilities by wrapping 
 - addTerms (SOAP, /_vti_bin/TaxonomyClientService.asmx)
 - getAllTerms (HTTP, /_vti_bin/client.svc/ProcessQuery)
 - setTermName (HTTP, /_vti_bin/client.svc/ProcessQuery)
+- deprecateTerm (HTTP, /_vti_bin/client.svc/ProcessQuery)

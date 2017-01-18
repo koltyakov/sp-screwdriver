@@ -339,7 +339,7 @@ spf.MMD = function(request) {
     this.setTermName = function(data) {
 
         var requestTemplate = Handlebars.compile(
-            `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library">
+            `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <SetProperty Id="166" ObjectPathId="157" Name="Name">
                         <Parameter Type="String">{{ newName }}</Parameter>
@@ -372,6 +372,65 @@ spf.MMD = function(request) {
 
                 var headers = {};
                 var srequestBody = '';
+
+                requestBody = requestTemplate(data);
+
+                headers["Accept"] = "*/*";
+                headers["Content-Type"] = "text/xml;charset=\"UTF-8\"";
+                headers["X-Requested-With"] = "XMLHttpRequest";
+                headers["Content-Length"] = requestBody.length;
+                headers["X-RequestDigest"] = digest;
+
+                return request.post(data.baseUrl + '/_vti_bin/client.svc/ProcessQuery', {
+                    headers: headers,
+                    body: requestBody,
+                    json: false
+                });
+            });
+    };
+
+    this.deprecateTerm = function(data) {
+
+        var requestTemplate = Handlebars.compile(
+            `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+                <Actions>
+                    <Method Name="Deprecate" Id="41" ObjectPathId="32">
+                        <Parameters>
+                            <Parameter Type="Boolean">{{ deprecate }}</Parameter>
+                        </Parameters>
+                    </Method>
+                </Actions>
+                <ObjectPaths>
+                    <StaticMethod Id="21" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" />
+                    <Property Id="24" ParentId="21" Name="TermStores" />
+                    <Method Id="26" ParentId="24" Name="GetByName">
+                        <Parameters>
+                            <Parameter Type="String">{{ serviceName }}</Parameter>
+                        </Parameters>
+                    </Method>
+                    <Method Id="29" ParentId="26" Name="GetTermSet">
+                        <Parameters>
+                            <Parameter Type="String">{{ termSetId }}</Parameter>
+                        </Parameters>
+                    </Method>
+                    <Method Id="32" ParentId="29" Name="GetTerm">
+                        <Parameters>
+                            <Parameter Type="String">{{ termId }}</Parameter>
+                        </Parameters>
+                    </Method>
+                </ObjectPaths>
+            </Request>`
+        );
+
+        return request.requestDigest(data.baseUrl)
+            .then(function(digest) {
+
+                var headers = {};
+                var srequestBody = '';
+
+                if (typeof data.deprecate === "undefined") {
+                    data.deprecate = true;
+                }
 
                 requestBody = requestTemplate(data);
 
