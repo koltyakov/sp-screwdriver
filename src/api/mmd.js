@@ -336,6 +336,59 @@ spf.MMD = function(request) {
             });
     };
 
+    this.setTermName = function(data) {
+
+        var requestTemplate = Handlebars.compile(
+            `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="Javascript Library">
+                <Actions>
+                    <SetProperty Id="166" ObjectPathId="157" Name="Name">
+                        <Parameter Type="String">{{ newName }}</Parameter>
+                    </SetProperty>
+                </Actions>
+                <ObjectPaths>
+                    <StaticMethod Id="146" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" />
+                    <Property Id="149" ParentId="146" Name="TermStores" />
+                    <Method Id="151" ParentId="149" Name="GetByName">
+                        <Parameters>
+                            <Parameter Type="String">{{ serviceName }}</Parameter>
+                        </Parameters>
+                    </Method>
+                    <Method Id="154" ParentId="151" Name="GetTermSet">
+                        <Parameters>
+                            <Parameter Type="String">{{ termSetId }}</Parameter>
+                        </Parameters>
+                    </Method>
+                    <Method Id="157" ParentId="154" Name="GetTerm">
+                        <Parameters>
+                            <Parameter Type="String">{{ termId }}</Parameter>
+                        </Parameters>
+                    </Method>
+                </ObjectPaths>
+            </Request>`
+        );
+
+        return request.requestDigest(data.baseUrl)
+            .then(function(digest) {
+
+                var headers = {};
+                var srequestBody = '';
+
+                requestBody = requestTemplate(data);
+
+                headers["Accept"] = "*/*";
+                headers["Content-Type"] = "text/xml;charset=\"UTF-8\"";
+                headers["X-Requested-With"] = "XMLHttpRequest";
+                headers["Content-Length"] = requestBody.length;
+                headers["X-RequestDigest"] = digest;
+
+                return request.post(data.baseUrl + '/_vti_bin/client.svc/ProcessQuery', {
+                    headers: headers,
+                    body: requestBody,
+                    json: false
+                });
+            });
+    };
+
     return this;
 
 };
