@@ -207,7 +207,7 @@ var getAllTerms = function() {
     screw.mmd.getAllTerms(data)
         .then(function(response) {
             var results = JSON.parse(response.body);
-            console.log("Response:", results[results.length - 1]['_Child_Items_']);
+            console.log("Response:", results); // [results.length - 1]['_Child_Items_']);
         })
         .catch(function(err) {
             console.log('Error:', err.message);
