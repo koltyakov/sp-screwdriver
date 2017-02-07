@@ -313,10 +313,10 @@ spf.MMD = function(request) {
                 <Actions>
                     <Query Id="78" ObjectPathId="76">
                         <Query SelectAllProperties="true">
-                            <Properties />' +
-                        </Query>' +
+                            <Properties />
+                        </Query>
                         <ChildItemQuery SelectAllProperties="true">
-                            {{ propertiesStr }}
+                            {{{ propertiesStr }}}
                         </ChildItemQuery>
                     </Query>
                 </Actions>
