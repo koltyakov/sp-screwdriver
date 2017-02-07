@@ -356,8 +356,11 @@ spf.MMD = function(request) {
                     headers: headers,
                     body: requestBody,
                     json: false
-                });
-                // .then(results => results[results.length - 1]['_Child_Items_']);
+                })
+                    .then(results => {
+                        results = JSON.parse(results.body);
+                        return results[results.length - 1]['_Child_Items_'];
+                    });
             });
     };
 
