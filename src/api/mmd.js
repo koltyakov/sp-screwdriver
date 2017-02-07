@@ -284,35 +284,59 @@ spf.MMD = function(request) {
 
     this.getAllTerms = function(data) {
 
-        var requestTemplate = Handlebars.compile(
-            '<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">' +
-                '<Actions>' +
-                    '<Query Id="78" ObjectPathId="76">' +
-                        '<Query SelectAllProperties="true">' +
-                            '<Properties />' +
-                        '</Query>' +
-                        '<ChildItemQuery SelectAllProperties="true">' +
-                            '<Properties />' +
-                        '</ChildItemQuery>' +
-                    '</Query>' +
-                '</Actions>' +
-                '<ObjectPaths>' +
-                    '<StaticMethod Id="65" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" />' +
-                    '<Property Id="68" ParentId="65" Name="TermStores" />' +
-                    '<Method Id="70" ParentId="68" Name="GetByName">' +
-                        '<Parameters>' +
-                            '<Parameter Type="String">{{ serviceName }}</Parameter>' +
-                        '</Parameters>' +
-                    '</Method>' +
-                    '<Method Id="73" ParentId="70" Name="GetTermSet">' +
-                        '<Parameters>' +
-                            '<Parameter Type="String">{{ termSetId }}</Parameter>' +
-                        '</Parameters>' +
-                    '</Method>' +
-                    '<Method Id="76" ParentId="73" Name="GetAllTerms" />' +
-                '</ObjectPaths>' +
-            '</Request>'
-        );
+        let propertiesXML = '<Properties />';
+        if (typeof data.properties !== 'undefined' && data.properties.length > 0) {
+            propertiesXML= data.properties.reduce((res, propName) => {
+                let propXML = `<Property Name="${propName}" SelectAll="true" />`;
+                if (propName === 'Parent') {
+                    propXML = `
+                        <Property Name="Parent">
+                            <Query SelectAllProperties="false">
+                                <Properties>
+                                    <Property Name="Id" SelectAll="true" />
+                                </Properties>
+                            </Query>
+                        </Property>
+                    `;
+                }
+                return res + propXML;
+            }, '');
+        }
+        data.propertiesStr = `
+            <Properties>
+                ${propertiesXML}
+            </Properties>
+        `;
+
+        var requestTemplate = Handlebars.compile(`
+            <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+                <Actions>
+                    <Query Id="78" ObjectPathId="76">
+                        <Query SelectAllProperties="true">
+                            <Properties />' +
+                        </Query>' +
+                        <ChildItemQuery SelectAllProperties="true">
+                            {{ propertiesStr }}
+                        </ChildItemQuery>
+                    </Query>
+                </Actions>
+                <ObjectPaths>
+                    <StaticMethod Id="65" Name="GetTaxonomySession" TypeId="{981cbc68-9edc-4f8d-872f-71146fcbb84f}" />
+                    <Property Id="68" ParentId="65" Name="TermStores" />
+                    <Method Id="70" ParentId="68" Name="GetByName">
+                        <Parameters>
+                            <Parameter Type="String">{{ serviceName }}</Parameter>
+                        </Parameters>
+                    </Method>
+                    <Method Id="73" ParentId="70" Name="GetTermSet">
+                        <Parameters>
+                            <Parameter Type="String">{{ termSetId }}</Parameter>
+                        </Parameters>
+                    </Method>
+                    <Method Id="76" ParentId="73" Name="GetAllTerms" />
+                </ObjectPaths>
+            </Request>
+        `);
 
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {

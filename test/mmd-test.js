@@ -190,7 +190,18 @@ var getAllTerms = function() {
     var data = {
         baseUrl: context.siteUrl,
         serviceName: config.mmd.serviceName,
-        termSetId: config.mmd.termSetId
+        termSetId: config.mmd.termSetId,
+        properties: [
+            'Id',
+            'Name',
+            'Description',
+            'CustomProperties',
+            'IsRoot',
+            'IsDeprecated',
+            'PathOfTerm',
+            'IsAvailableForTagging',
+            'Parent'
+        ]
     };
 
     screw.mmd.getAllTerms(data)
