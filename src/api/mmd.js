@@ -59,7 +59,6 @@ spf.MMD = function(request) {
             data.termSetIds = [data.termSetId];
         }
 
-
         soapBody = soapTemplate(data);
 
         headers["Accept"] = "application/xml, text/xml, */*; q=0.01";

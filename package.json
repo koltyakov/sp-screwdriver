@@ -1,6 +1,6 @@
 {
   "name": "sp-screwdriver",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Node.js Screwdriver for SharePoint",
   "main": "./src/index.js",
   "scripts": {

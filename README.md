@@ -22,7 +22,7 @@ This library implements (or at least tries) some vital capabilities by wrapping 
 
 ## APIs
 
-### Manage Metadata Service (Taxonomy)
+### User Profiles Service
 
 - getUserProfileByName (SOAP, /_vti_bin/UserProfileService.asmx)
 - modifyUserPropertyByAccountName (SOAP, /_vti_bin/UserProfileService.asmx)
@@ -30,7 +30,7 @@ This library implements (or at least tries) some vital capabilities by wrapping 
 - getUserProfilePropertyFor (REST, /_api/sp.userprofiles.peoplemanager/getpropertiesfor)
 - getPropertiesFor (REST, /_api/sp.userprofiles.peoplemanager/getuserprofilepropertyfor)
 
-### User Profiles Service
+### Manage Metadata Service (Taxonomy)
 
 - getTermSets (SOAP, /_vti_bin/TaxonomyClientService.asmx)
 - getChildTermsInTermSet (SOAP, /_vti_bin/TaxonomyClientService.asmx)
