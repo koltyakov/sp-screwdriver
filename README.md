@@ -29,6 +29,8 @@ This library implements (or at least tries) some vital capabilities by wrapping 
 - getUserPropertyByAccountName (SOAP, /_vti_bin/UserProfileService.asmx)
 - getUserProfilePropertyFor (REST, /_api/sp.userprofiles.peoplemanager/getpropertiesfor)
 - getPropertiesFor (REST, /_api/sp.userprofiles.peoplemanager/getuserprofilepropertyfor)
+- setSingleValueProfileProperty (HTTP, /_vti_bin/client.svc/ProcessQuery)
+- setMultiValuedProfileProperty (HTTP, /_vti_bin/client.svc/ProcessQuery)
 
 ### Manage Metadata Service (Taxonomy)
 

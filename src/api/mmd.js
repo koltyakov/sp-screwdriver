@@ -6,7 +6,7 @@ spf.MMD = function(request) {
 
     /* SOAP */
 
-    this.getTermSets = function(data) {
+    this.getTermSets = (data) => {
         var headers = {};
         var soapBody = '';
 
@@ -73,7 +73,7 @@ spf.MMD = function(request) {
         });
     };
 
-    this.getChildTermsInTermSet = function(data) {
+    this.getChildTermsInTermSet = (data) => {
         var headers = {};
         var soapBody = '';
 
@@ -107,7 +107,7 @@ spf.MMD = function(request) {
         });
     };
 
-    this.getChildTermsInTerm = function(data) {
+    this.getChildTermsInTerm = (data) => {
         var headers = {};
         var soapBody = '';
 
@@ -142,7 +142,7 @@ spf.MMD = function(request) {
         });
     };
 
-    this.getTermsByLabel = function(data) {
+    this.getTermsByLabel = (data) => {
         var headers = {};
         var soapBody = '';
 
@@ -197,7 +197,7 @@ spf.MMD = function(request) {
         });
     };
 
-    this.getKeywordTermsByGuids = function(data) {
+    this.getKeywordTermsByGuids = (data) => {
         var headers = {};
         var soapBody = '';
 
@@ -242,7 +242,7 @@ spf.MMD = function(request) {
         });
     };
 
-    this.addTerms = function(data) {
+    this.addTerms = (data) => {
         var headers = {};
         var soapBody = '';
 
@@ -281,7 +281,7 @@ spf.MMD = function(request) {
 
     /* HTTP */
 
-    this.getAllTerms = function(data) {
+    this.getAllTerms = (data) => {
 
         let propertiesXML = '<Properties />';
         if (typeof data.properties !== 'undefined' && data.properties.length > 0) {
@@ -341,7 +341,7 @@ spf.MMD = function(request) {
             .then(function(digest) {
 
                 var headers = {};
-                var srequestBody = '';
+                var requestBody = '';
 
                 requestBody = requestTemplate(data);
 
@@ -363,7 +363,7 @@ spf.MMD = function(request) {
             });
     };
 
-    this.setTermName = function(data) {
+    this.setTermName = (data) => {
 
         var requestTemplate = Handlebars.compile(
             `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
@@ -398,7 +398,7 @@ spf.MMD = function(request) {
             .then(function(digest) {
 
                 var headers = {};
-                var srequestBody = '';
+                var requestBody = '';
 
                 requestBody = requestTemplate(data);
 
@@ -416,7 +416,7 @@ spf.MMD = function(request) {
             });
     };
 
-    this.deprecateTerm = function(data) {
+    this.deprecateTerm = (data) => {
 
         var requestTemplate = Handlebars.compile(
             `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
@@ -453,7 +453,7 @@ spf.MMD = function(request) {
             .then(function(digest) {
 
                 var headers = {};
-                var srequestBody = '';
+                var requestBody = '';
 
                 if (typeof data.deprecate === "undefined") {
                     data.deprecate = true;

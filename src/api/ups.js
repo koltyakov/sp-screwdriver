@@ -6,7 +6,7 @@ spf.UPS = function(request) {
 
     /* SOAP */
 
-    this.getUserProfileByName = function(data) {
+    this.getUserProfileByName = (data) => {
         var headers = {};
         var soapBody = '';
         var soapTemplate = Handlebars.compile(
@@ -34,7 +34,7 @@ spf.UPS = function(request) {
         });
     };
 
-    this.getUserPropertyByAccountName = function(data) {
+    this.getUserPropertyByAccountName = (data) => {
         var headers = {};
         var soapBody = '';
         var soapTemplate = Handlebars.compile(
@@ -63,7 +63,7 @@ spf.UPS = function(request) {
         });
     };
 
-    this.modifyUserPropertyByAccountName = function(data) {
+    this.modifyUserPropertyByAccountName = (data) => {
         var headers = {};
         var soapBody = '';
         var soapTemplate = Handlebars.compile(
@@ -127,19 +127,107 @@ spf.UPS = function(request) {
 
     /* REST */
 
-    this.getPropertiesFor = function(data) {
+    this.getPropertiesFor = (data) => {
         var methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
             `/getpropertiesfor(` +
                 `accountName='${encodeURIComponent(data.accountName)}')`;
         return request.get(methodUrl);
     };
 
-    this.getUserProfilePropertyFor = function(data) {
+    this.getUserProfilePropertyFor = (data) => {
         var methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
             `/getuserprofilepropertyfor(` +
                 `accountName='${encodeURIComponent(data.accountName)}',` +
                 `propertyname='${data.propertyName}')`;
         return request.get(methodUrl);
+    };
+
+    /* HTTP */
+
+    this.setSingleValueProfileProperty = (data) => {
+        var requestTemplate = Handlebars.compile(`
+            <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+                <Actions>
+                    <ObjectPath Id="71" ObjectPathId="70" />
+                    <Method Name="SetSingleValueProfileProperty" Id="72" ObjectPathId="70">
+                        <Parameters>
+                            <Parameter Type="String">{{ accountName }}</Parameter>
+                            <Parameter Type="String">{{ propertyName }}</Parameter>
+                            <Parameter Type="String">{{ propertyValue }}</Parameter>
+                        </Parameters>
+                    </Method>
+                </Actions>
+                <ObjectPaths>
+                    <Constructor Id="70" TypeId="{cf560d69-0fdb-4489-a216-b6b47adf8ef8}" />
+                </ObjectPaths>
+            </Request>
+        `);
+
+        return request.requestDigest(data.baseUrl)
+            .then(function(digest) {
+
+                var headers = {};
+                var requestBody = '';
+
+                requestBody = requestTemplate(data);
+
+                headers["Accept"] = "*/*";
+                headers["Content-Type"] = "text/xml;charset=\"UTF-8\"";
+                headers["X-Requested-With"] = "XMLHttpRequest";
+                headers["Content-Length"] = requestBody.length;
+                headers["X-RequestDigest"] = digest;
+
+                return request.post(data.baseUrl + '/_vti_bin/client.svc/ProcessQuery', {
+                    headers: headers,
+                    body: requestBody,
+                    json: false
+                });
+            });
+    };
+
+    this.setMultiValuedProfileProperty = (data) => {
+        var requestTemplate = Handlebars.compile(`
+            <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+                <Actions>
+                    <ObjectPath Id="82" ObjectPathId="81" />
+                    <Method Name="SetMultiValuedProfileProperty" Id="83" ObjectPathId="81">
+                        <Parameters>
+                            <Parameter Type="String">{{ accountName }}</Parameter>
+                            <Parameter Type="String">{{ propertyName }}</Parameter>
+                            <Parameter Type="Array">
+                                {{#propertyValues}}
+                                <Object Type="String">{{ this }}</Object>
+                                {{/propertyValues}}
+                            </Parameter>
+                        </Parameters>
+                    </Method>
+                </Actions>
+                <ObjectPaths>
+                    <Constructor Id="81" TypeId="{cf560d69-0fdb-4489-a216-b6b47adf8ef8}" />
+                </ObjectPaths>
+            </Request>
+        `);
+
+        return request.requestDigest(data.baseUrl)
+            .then(function(digest) {
+
+                var headers = {};
+                var requestBody = '';
+
+                requestBody = requestTemplate(data);
+
+                headers["Accept"] = "*/*";
+                headers["Content-Type"] = "text/xml;charset=\"UTF-8\"";
+                headers["X-Requested-With"] = "XMLHttpRequest";
+                headers["Content-Length"] = requestBody.length;
+                headers["X-RequestDigest"] = digest;
+
+                return request.post(data.baseUrl + '/_vti_bin/client.svc/ProcessQuery', {
+                    headers: headers,
+                    body: requestBody,
+                    json: false
+                });
+            });
     };
 
     return this;

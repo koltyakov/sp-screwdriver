@@ -1,23 +1,23 @@
-var path = require('path');
-var cpass = new (require('cpass'));
-var parseString = require('xml2js').parseString;
+const path = require('path');
+const cpass = new (require('cpass'));
+const parseString = require('xml2js').parseString;
 
-var Screwdriver = require(__dirname + "/../src/index");
+const Screwdriver = require(__dirname + "/../src/index");
 
-var configPath = path.join(__dirname + "/config/_private.conf.json");
-var config = require(configPath);
-var context = config.context;
+let configPath = path.join(__dirname + "/config/_private.conf.json");
+let config = require(configPath);
+let context = config.context;
 if (context.password) {
     context.password = cpass.decode(context.password);
 }
 
-var screw = new Screwdriver(context);
+const screw = new Screwdriver(context);
 
 // ================================
 
-var getTermSets = function() {
+let getTermSets = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         sspId: config.mmd.sspId,
         // sspIds: [config.mmd.sspId],
@@ -43,9 +43,9 @@ var getTermSets = function() {
 
 // ================================
 
-var getChildTermsInTermSet = function() {
+let getChildTermsInTermSet = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         sspId: config.mmd.sspId,
         termSetId: config.mmd.termSetId,
@@ -55,7 +55,7 @@ var getChildTermsInTermSet = function() {
     screw.mmd.getChildTermsInTermSet(data)
         .then(function(response) {
             parseString(response.body, function(err, result) {
-                var xmlResult = result['soap:Envelope']['soap:Body'][0]['GetChildTermsInTermSetResponse'][0]['GetChildTermsInTermSetResult'][0];
+                let xmlResult = result['soap:Envelope']['soap:Body'][0]['GetChildTermsInTermSetResponse'][0]['GetChildTermsInTermSetResult'][0];
                 parseString(xmlResult, function(err, terms) {
                     console.log("Terms:", terms['TermStore']);
                 });
@@ -70,9 +70,9 @@ var getChildTermsInTermSet = function() {
 
 // ================================
 
-var getChildTermsInTerm = function() {
+let getChildTermsInTerm = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         sspId: config.mmd.sspId,
         lcid: config.mmd.lcid,
@@ -83,7 +83,7 @@ var getChildTermsInTerm = function() {
     screw.mmd.getChildTermsInTerm(data)
         .then(function(response) {
             parseString(response.body, function(err, result) {
-                var xmlResult = result['soap:Envelope']['soap:Body'][0]['GetChildTermsInTermResponse'][0]['GetChildTermsInTermResult'][0];
+                let xmlResult = result['soap:Envelope']['soap:Body'][0]['GetChildTermsInTermResponse'][0]['GetChildTermsInTermResult'][0];
                 parseString(xmlResult, function(err, terms) {
                     console.log("Terms:", terms['TermStore']);
                 });
@@ -98,9 +98,9 @@ var getChildTermsInTerm = function() {
 
 // ================================
 
-var getTermsByLabel = function() {
+let getTermsByLabel = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         label: "New label",
         lcid: config.mmd.lcid,
@@ -114,7 +114,7 @@ var getTermsByLabel = function() {
     screw.mmd.getTermsByLabel(data)
         .then(function(response) {
             parseString(response.body, function(err, result) {
-                var xmlResult = result['soap:Envelope']['soap:Body'][0]['GetTermsByLabelResponse'][0]['GetTermsByLabelResult'][0];
+                let xmlResult = result['soap:Envelope']['soap:Body'][0]['GetTermsByLabelResponse'][0]['GetTermsByLabelResult'][0];
                 parseString(xmlResult, function(err, terms) {
                     console.log("Terms:", terms['TermStore']);
                 });
@@ -130,9 +130,9 @@ var getTermsByLabel = function() {
 
 // ================================
 
-var getKeywordTermsByGuids = function() {
+let getKeywordTermsByGuids = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         lcid: config.mmd.lcid,
         termId: config.mmd.termId,
@@ -142,7 +142,7 @@ var getKeywordTermsByGuids = function() {
     screw.mmd.getKeywordTermsByGuids(data)
         .then(function(response) {
             parseString(response.body, function(err, result) {
-                var xmlResult = result['soap:Envelope']['soap:Body'][0]['GetKeywordTermsByGuidsResponse'][0]['GetKeywordTermsByGuidsResult'][0];
+                let xmlResult = result['soap:Envelope']['soap:Body'][0]['GetKeywordTermsByGuidsResponse'][0]['GetKeywordTermsByGuidsResult'][0];
                 parseString(xmlResult, function(err, terms) {
                     console.log("Terms:", terms['TermStore']);
                 });
@@ -157,9 +157,9 @@ var getKeywordTermsByGuids = function() {
 
 // ================================
 
-var addTerms = function() {
+let addTerms = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         sspId: config.mmd.sspId,
         termSetId: config.mmd.termSetId,
@@ -185,9 +185,9 @@ var addTerms = function() {
 
 // ================================
 
-var getAllTerms = function() {
+let getAllTerms = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         serviceName: config.mmd.serviceName,
         termSetId: config.mmd.termSetId,
@@ -206,7 +206,7 @@ var getAllTerms = function() {
 
     screw.mmd.getAllTerms(data)
         .then(function(response) {
-            var results = JSON.parse(response.body);
+            let results = JSON.parse(response.body);
             console.log("Response:", results); // [results.length - 1]['_Child_Items_']);
         })
         .catch(function(err) {
@@ -218,9 +218,9 @@ var getAllTerms = function() {
 
 // ================================
 
-var setTermName = function() {
+let setTermName = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         serviceName: config.mmd.serviceName,
         termSetId: config.mmd.termSetId,
@@ -230,7 +230,7 @@ var setTermName = function() {
 
     screw.mmd.setTermName(data)
         .then(function(response) {
-            // var results = JSON.parse(response.body);
+            // let results = JSON.parse(response.body);
             console.log("Response:", response.body);
         })
         .catch(function(err) {
@@ -242,9 +242,9 @@ var setTermName = function() {
 
 // ================================
 
-var deprecateTerm = function() {
+let deprecateTerm = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         serviceName: config.mmd.serviceName,
         termSetId: config.mmd.termSetId,
@@ -254,7 +254,7 @@ var deprecateTerm = function() {
 
     screw.mmd.deprecateTerm(data)
         .then(function(response) {
-            // var results = JSON.parse(response.body);
+            // let results = JSON.parse(response.body);
             console.log("Response:", response.body);
         })
         .catch(function(err) {

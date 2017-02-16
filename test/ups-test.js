@@ -1,23 +1,23 @@
-var path = require('path');
-var cpass = new (require('cpass'));
-var parseString = require('xml2js').parseString;
+const path = require('path');
+const cpass = new (require('cpass'));
+const parseString = require('xml2js').parseString;
 
-var Screwdriver = require(__dirname + "/../src/index");
+const Screwdriver = require(__dirname + "/../src/index");
 
-var configPath = path.join(__dirname + "/config/_private.conf.json");
-var config = require(configPath);
-var context = config.context;
+let configPath = path.join(__dirname + "/config/_private.conf.json");
+let config = require(configPath);
+let context = config.context;
 if (context.password) {
     context.password = cpass.decode(context.password);
 }
 
-var screw = new Screwdriver(context);
+const screw = new Screwdriver(context);
 
 // ================================
 
-var getUserProfileByName = function() {
+let getUserProfileByName = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         accountName: config.ups.accountName
     };
@@ -37,9 +37,9 @@ var getUserProfileByName = function() {
 
 // ================================
 
-var modifyUserPropertyByAccountName = function() {
+let modifyUserPropertyByAccountName = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         accountName: config.ups.accountName,
         newData: [{
@@ -70,9 +70,9 @@ var modifyUserPropertyByAccountName = function() {
 
 // ================================
 
-var getUserPropertyByAccountName = function() {
+let getUserPropertyByAccountName = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         accountName: config.ups.accountName,
         propertyName: 'SPS-Birthday'
@@ -93,9 +93,9 @@ var getUserPropertyByAccountName = function() {
 
 // ================================
 
-var getUserProfilePropertyFor = function() {
+let getUserProfilePropertyFor = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         accountName: config.ups.accountName,
         propertyName: 'SPS-Birthday'
@@ -114,9 +114,9 @@ var getUserProfilePropertyFor = function() {
 
 // ================================
 
-var getPropertiesFor = function() {
+let getPropertiesFor = () => {
 
-    var data = {
+    let data = {
         baseUrl: context.siteUrl,
         accountName: config.ups.accountName
     };
@@ -131,3 +131,47 @@ var getPropertiesFor = function() {
 
 };
 // getPropertiesFor();
+
+// ================================
+
+let setSingleValueProfileProperty = () => {
+
+    let data = {
+        baseUrl: context.siteUrl,
+        accountName: config.ups.accountName,
+        propertyName: 'AboutMe',
+        propertyValue: 'Front-end developer & Lazy guy'
+    };
+
+    screw.ups.setSingleValueProfileProperty(data)
+        .then(function(response) {
+            console.log('Response:', JSON.parse(response.body));
+        })
+        .catch(function(err) {
+            console.log('Error:', err.message);
+        });
+
+};
+// setSingleValueProfileProperty();
+
+// ================================
+
+let setMultiValuedProfileProperty = () => {
+
+    let data = {
+        baseUrl: context.siteUrl,
+        accountName: config.ups.accountName,
+        propertyName: 'SPS-Skills',
+        propertyValues: [ 'Git', 'Node.js', 'JavaScript', 'SharePoint' ]
+    };
+
+    screw.ups.setMultiValuedProfileProperty(data)
+        .then(function(response) {
+            console.log('Response:', JSON.parse(response.body));
+        })
+        .catch(function(err) {
+            console.log('Error:', err.message);
+        });
+
+};
+setMultiValuedProfileProperty();
