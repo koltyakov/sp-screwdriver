@@ -1,8 +1,7 @@
-var Handlebars = require('handlebars');
+const Handlebars = require('handlebars');
+const util = require('../util');
 
-var spf = spf || {};
-
-spf.MMD = function(request) {
+const MMD = function(request) {
 
     /* SOAP */
 
@@ -13,44 +12,44 @@ spf.MMD = function(request) {
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<GetTermSets xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">' +
-                        '<sharedServiceIds>' +
-                            '&lt;sspIds&gt;' +
-                                '{{#sspIds}}' +
-                                    '&lt;sspId&gt;' +
-                                        '{{ this }}' +
-                                    '&lt;/sspId&gt;' +
-                                '{{/sspIds}}' +
-                            '&lt;/sspIds&gt;' +
-                        '</sharedServiceIds>' +
-                        '<termSetIds>' +
-                            '&lt;termSetIds&gt;' +
-                                '{{#termSetIds}}' +
-                                    '&lt;termSetId&gt;' +
-                                        '{{ this }}' +
-                                    '&lt;/termSetId&gt;' +
-                                '{{#termSetIds}}' +
-                            '&lt;/termSetIds&gt;' +
-                        '</termSetIds>' +
-                        '<lcid>{{ lcid }}</lcid>' +
-                        '<clientTimeStamps>' +
-                            '&lt;dateTimes&gt;&lt;dateTime&gt;' +
-                                '{{ clientTimeStamp }}' +
-                            '&lt;/dateTime&gt;&lt;/dateTimes&gt;' +
-                        '</clientTimeStamps>' +
-                        '<clientVersions>' +
-                            '&lt;versions&gt;&lt;version&gt;' +
-                                '{{ clientVersion }}' +
-                            '&lt;/version&gt;&lt;/versions&gt;' +
-                        '</clientVersions>' +
-                    '</GetTermSets>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <GetTermSets xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                        <sharedServiceIds>
+                            &lt;sspIds&gt;
+                                {{#sspIds}}
+                                    &lt;sspId&gt;
+                                        {{ this }}
+                                    &lt;/sspId&gt;
+                                {{/sspIds}}
+                            &lt;/sspIds&gt;
+                        </sharedServiceIds>
+                        <termSetIds>
+                            &lt;termSetIds&gt;
+                                {{#termSetIds}}
+                                    &lt;termSetId&gt;
+                                        {{ this }}
+                                    &lt;/termSetId&gt;
+                                {{/termSetIds}}
+                            &lt;/termSetIds&gt;
+                        </termSetIds>
+                        <lcid>{{ lcid }}</lcid>
+                        <clientTimeStamps>
+                            &lt;dateTimes&gt;&lt;dateTime&gt;
+                                {{ clientTimeStamp }}
+                            &lt;/dateTime&gt;&lt;/dateTimes&gt;
+                        </clientTimeStamps>
+                        <clientVersions>
+                            &lt;versions&gt;&lt;version&gt;
+                                {{ clientVersion }}
+                            &lt;/version&gt;&lt;/versions&gt;
+                        </clientVersions>
+                    </GetTermSets>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         if (typeof data.sspId !== "undefined" && typeof data.sspIds === "undefined") {
             data.sspIds = [data.sspId];
@@ -80,18 +79,18 @@ spf.MMD = function(request) {
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<GetChildTermsInTermSet xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">' +
-                        '<sspId>{{ sspId }}</sspId>' +
-                        '<lcid>{{ lcid }}</lcid>' +
-                        '<termSetId>{{ termSetId }}</termSetId>' +
-                    '</GetChildTermsInTermSet>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <GetChildTermsInTermSet xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                        <sspId>{{ sspId }}</sspId>
+                        <lcid>{{ lcid }}</lcid>
+                        <termSetId>{{ termSetId }}</termSetId>
+                    </GetChildTermsInTermSet>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         soapBody = soapTemplate(data);
 
@@ -114,19 +113,19 @@ spf.MMD = function(request) {
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<GetChildTermsInTerm xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">' +
-                        '<sspId>{{ sspId }}</sspId>' +
-                        '<lcid>{{ lcid }}</lcid>' +
-                        '<termId>{{ termId }}</termId>' +
-                        '<termSetId>{{ termSetId }}</termSetId>' +
-                    '</GetChildTermsInTerm>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <GetChildTermsInTerm xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                        <sspId>{{ sspId }}</sspId>
+                        <lcid>{{ lcid }}</lcid>
+                        <termId>{{ termId }}</termId>
+                        <termSetId>{{ termSetId }}</termSetId>
+                    </GetChildTermsInTerm>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         soapBody = soapTemplate(data);
 
@@ -149,29 +148,29 @@ spf.MMD = function(request) {
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<GetTermsByLabel xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">' +
-                        '<label>{{ label }}</label>' +
-                        '<lcid>{{ lcid }}</lcid>' +
-                        '<matchOption>{{ matchOption }}</matchOption>' +
-                        '<resultCollectionSize>{{ resultCollectionSize }}</resultCollectionSize>' +
-                        '<termIds>' +
-                            '&lt;termIds&gt;' +
-                                '{{#termIds}}' +
-                                    '&lt;termId&gt;' +
-                                        '{{ this }}' +
-                                    '&lt;/termId&gt;' +
-                                '{{/termIds}}' +
-                            '&lt;/termIds&gt;' +
-                        '</termIds>' +
-                        '<addIfNotFound>{{ addIfNotFound }}</addIfNotFound>' +
-                    '</GetTermsByLabel>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <GetTermsByLabel xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                        <label>{{ label }}</label>
+                        <lcid>{{ lcid }}</lcid>
+                        <matchOption>{{ matchOption }}</matchOption>
+                        <resultCollectionSize>{{ resultCollectionSize }}</resultCollectionSize>
+                        <termIds>
+                            &lt;termIds&gt;
+                                {{#termIds}}
+                                    &lt;termId&gt;
+                                        {{ this }}
+                                    &lt;/termId&gt;
+                                {{/termIds}}
+                            &lt;/termIds&gt;
+                        </termIds>
+                        <addIfNotFound>{{ addIfNotFound }}</addIfNotFound>
+                    </GetTermsByLabel>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         data.matchOption = data.matchOption || "ExactMatch"; // or StartsWith
         data.resultCollectionSize = data.resultCollectionSize || 25;
@@ -204,25 +203,25 @@ spf.MMD = function(request) {
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<GetKeywordTermsByGuids xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">' +
-                        '<termIds>' +
-                            '&lt;termIds&gt;' +
-                                '{{#termIds}}' +
-                                    '&lt;termId&gt;' +
-                                        '{{ this }}' +
-                                    '&lt;/termId&gt;' +
-                                '{{/termIds}}' +
-                            '&lt;/termIds&gt;' +
-                        '</termIds>' +
-                        '<lcid>{{ lcid }}</lcid>' +
-                    '</GetKeywordTermsByGuids>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <GetKeywordTermsByGuids xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                        <termIds>
+                            &lt;termIds&gt;
+                                {{#termIds}}
+                                    &lt;termId&gt;
+                                        {{ this }}
+                                    &lt;/termId&gt;
+                                {{/termIds}}
+                            &lt;/termIds&gt;
+                        </termIds>
+                        <lcid>{{ lcid }}</lcid>
+                    </GetKeywordTermsByGuids>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         if (typeof data.termId !== "undefined" && typeof data.termIds === "undefined") {
             data.termIds = [data.termId];
@@ -249,21 +248,21 @@ spf.MMD = function(request) {
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<AddTerms xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">' +
-                        '<sharedServiceId>{{ sspId }}</sharedServiceId>' +
-                        '<termSetId>{{ termSetId }}</termSetId>' +
-                        '<lcid>{{ lcid }}</lcid>' +
-                        '<newTerms>' +
-                            '{{ newTerms }}' +
-                        '</newTerms>' +
-                    '</AddTerms>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <AddTerms xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                        <sharedServiceId>{{ sspId }}</sharedServiceId>
+                        <termSetId>{{ termSetId }}</termSetId>
+                        <lcid>{{ lcid }}</lcid>
+                        <newTerms>
+                            {{ newTerms }}
+                        </newTerms>
+                    </AddTerms>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         soapBody = soapTemplate(data);
 
@@ -307,7 +306,7 @@ spf.MMD = function(request) {
             </Properties>
         `;
 
-        var requestTemplate = Handlebars.compile(`
+        var requestTemplate = Handlebars.compile(util.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <Query Id="78" ObjectPathId="76">
@@ -335,7 +334,7 @@ spf.MMD = function(request) {
                     <Method Id="76" ParentId="73" Name="GetAllTerms" />
                 </ObjectPaths>
             </Request>
-        `);
+        `));
 
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
@@ -365,8 +364,8 @@ spf.MMD = function(request) {
 
     this.setTermName = (data) => {
 
-        var requestTemplate = Handlebars.compile(
-            `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+        var requestTemplate = Handlebars.compile(util.trimMultiline(`
+            <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <SetProperty Id="166" ObjectPathId="157" Name="Name">
                         <Parameter Type="String">{{ newName }}</Parameter>
@@ -391,8 +390,8 @@ spf.MMD = function(request) {
                         </Parameters>
                     </Method>
                 </ObjectPaths>
-            </Request>`
-        );
+            </Request>
+        `));
 
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
@@ -418,8 +417,8 @@ spf.MMD = function(request) {
 
     this.deprecateTerm = (data) => {
 
-        var requestTemplate = Handlebars.compile(
-            `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+        var requestTemplate = Handlebars.compile(util.trimMultiline(`
+            <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <Method Name="Deprecate" Id="41" ObjectPathId="32">
                         <Parameters>
@@ -446,8 +445,8 @@ spf.MMD = function(request) {
                         </Parameters>
                     </Method>
                 </ObjectPaths>
-            </Request>`
-        );
+            </Request>
+        `));
 
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
@@ -479,4 +478,4 @@ spf.MMD = function(request) {
 
 };
 
-module.exports = spf.MMD;
+module.exports = MMD;

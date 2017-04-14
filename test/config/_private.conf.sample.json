@@ -13,5 +13,15 @@
         "termSetId": "8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f",
         "termId": "e66280de-4fdd-4cb9-8783-ce3efe3f7ef8",
         "lcid": 1033
+    },
+    "versions": {
+        "documents": {
+            "fileName": "Shared%20Documents/Filename.xlsx"
+        },
+        "items": {
+            "listId": "BE710A75-3CF7-4D62-BB95-C317FFAA7905",
+            "itemId": "1",
+            "fieldName": "Title"
+        }
     }
 }

@@ -1,24 +1,23 @@
-var Handlebars = require('handlebars');
+const Handlebars = require('handlebars');
+const util = require('../util');
 
-var spf = spf || {};
-
-spf.UPS = function(request) {
+const UPS = function(request) {
 
     /* SOAP */
 
     this.getUserProfileByName = (data) => {
         var headers = {};
         var soapBody = '';
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<GetUserProfileByName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">' +
-                        '<AccountName>{{ accountName }}</AccountName>' +
-                    '</GetUserProfileByName>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <GetUserProfileByName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+                        <AccountName>{{ accountName }}</AccountName>
+                    </GetUserProfileByName>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         soapBody = soapTemplate(data);
 
@@ -37,17 +36,17 @@ spf.UPS = function(request) {
     this.getUserPropertyByAccountName = (data) => {
         var headers = {};
         var soapBody = '';
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<GetUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">' +
-                        '<accountName>{{ accountName }}</accountName>' +
-                        '<propertyName>{{ propertyName }}</propertyName>' +
-                    '</GetUserPropertyByAccountName>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <GetUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+                        <accountName>{{ accountName }}</accountName>
+                        <propertyName>{{ propertyName }}</propertyName>
+                    </GetUserPropertyByAccountName>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         soapBody = soapTemplate(data);
 
@@ -66,33 +65,33 @@ spf.UPS = function(request) {
     this.modifyUserPropertyByAccountName = (data) => {
         var headers = {};
         var soapBody = '';
-        var soapTemplate = Handlebars.compile(
-            '<?xml version="1.0" encoding="utf-8"?>' +
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' +
-                '<soap:Body>' +
-                    '<ModifyUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">' +
-                        '<accountName>{{ accountName }}</accountName>' +
-                        '<newData>' +
-                            '{{#newData}}' +
-                            '<PropertyData>' +
-                                '<IsPrivacyChanged>{{ isPrivacyChanged }}</IsPrivacyChanged>' +
-                                '<IsValueChanged>{{ isValueChanged }}</IsValueChanged>' +
-                                '<Name>{{ name }}</Name>' +
-                                '<Privacy>{{ privacy }}</Privacy>' +
-                                '<Values>' +
-                                    '{{#values}}' +
-                                    '<ValueData>' +
-                                        '<Value xsi:type="xsd:string">{{ this }}</Value>' +
-                                    '</ValueData>' +
-                                    '{{/values}}' +
-                                '</Values>' +
-                            '</PropertyData>' +
-                            '{{/newData}}' +
-                        '</newData>' +
-                    '</ModifyUserPropertyByAccountName>' +
-                '</soap:Body>' +
-            '</soap:Envelope>'
-        );
+        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                <soap:Body>
+                    <ModifyUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+                        <accountName>{{ accountName }}</accountName>
+                        <newData>
+                            {{#newData}}
+                            <PropertyData>
+                                <IsPrivacyChanged>{{ isPrivacyChanged }}</IsPrivacyChanged>
+                                <IsValueChanged>{{ isValueChanged }}</IsValueChanged>
+                                <Name>{{ name }}</Name>
+                                <Privacy>{{ privacy }}</Privacy>
+                                <Values>
+                                    {{#values}}
+                                    <ValueData>
+                                        <Value xsi:type="xsd:string">{{ this }}</Value>
+                                    </ValueData>
+                                    {{/values}}
+                                </Values>
+                            </PropertyData>
+                            {{/newData}}
+                        </newData>
+                    </ModifyUserPropertyByAccountName>
+                </soap:Body>
+            </soap:Envelope>
+        `));
 
         data.newData = (data.newData || []).map(function(data) {
             if (typeof data.value !== "undefined" && typeof data.values === "undefined") {
@@ -145,7 +144,7 @@ spf.UPS = function(request) {
     /* HTTP */
 
     this.setSingleValueProfileProperty = (data) => {
-        var requestTemplate = Handlebars.compile(`
+        var requestTemplate = Handlebars.compile(util.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <ObjectPath Id="71" ObjectPathId="70" />
@@ -161,7 +160,7 @@ spf.UPS = function(request) {
                     <Constructor Id="70" TypeId="{cf560d69-0fdb-4489-a216-b6b47adf8ef8}" />
                 </ObjectPaths>
             </Request>
-        `);
+        `));
 
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
@@ -186,7 +185,7 @@ spf.UPS = function(request) {
     };
 
     this.setMultiValuedProfileProperty = (data) => {
-        var requestTemplate = Handlebars.compile(`
+        var requestTemplate = Handlebars.compile(util.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <ObjectPath Id="82" ObjectPathId="81" />
@@ -206,7 +205,7 @@ spf.UPS = function(request) {
                     <Constructor Id="81" TypeId="{cf560d69-0fdb-4489-a216-b6b47adf8ef8}" />
                 </ObjectPaths>
             </Request>
-        `);
+        `));
 
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
@@ -234,4 +233,4 @@ spf.UPS = function(request) {
 
 };
 
-module.exports = spf.UPS;
+module.exports = UPS;

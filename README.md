@@ -44,6 +44,19 @@ This library implements (or at least tries) some vital capabilities by wrapping 
 - setTermName (HTTP, /_vti_bin/client.svc/ProcessQuery)
 - deprecateTerm (HTTP, /_vti_bin/client.svc/ProcessQuery)
 
+### Versions
+
+#### Document versions
+
+- getVersions (SOAP, /_vti_bin/versions.asmx)
+- restoreVersion (SOAP, /_vti_bin/versions.asmx)
+- deleteVersion (SOAP, /_vti_bin/versions.asmx)
+- deleteAllVersions (SOAP, /_vti_bin/versions.asmx)
+
+#### Item versions
+
+- getVersionCollection (SOAP, /_vti_bin/lists.asmx)
+
 ### Possible SOAP services to implement
 
 - Alerts (/_vti_bin/alerts.asmx)
@@ -65,7 +78,6 @@ This library implements (or at least tries) some vital capabilities by wrapping 
 - Users and Groups Web service (/_vti_bin/UserGroup.asmx)
 - User Profile Change Web service (/_vti_bin/userprofilechangeservice.asmx)
 - User Profile Web service (/_vti_bin/userprofileservice.asmx)
-- Versions Web service (/_vti_bin/versions.asmx)
 - Views Web service (/_vti_bin/Views.asmx)
 - Web Part Pages Web service (/_vti_bin/webpartpages.asmx)
 - Webs Web service (/_vti_bin/Webs.asmx)
