@@ -23,5 +23,9 @@
             "itemId": "1",
             "fieldName": "Title"
         }
+    },
+    "items": {
+        "listPath": "/_catalogs/masterpage",
+        "itemId": 3746
     }
 }

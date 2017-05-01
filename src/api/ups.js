@@ -6,9 +6,9 @@ const UPS = function(request) {
     /* SOAP */
 
     this.getUserProfileByName = (data) => {
-        var headers = {};
-        var soapBody = '';
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let headers = {};
+        let soapBody = '';
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -34,9 +34,9 @@ const UPS = function(request) {
     };
 
     this.getUserPropertyByAccountName = (data) => {
-        var headers = {};
-        var soapBody = '';
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let headers = {};
+        let soapBody = '';
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -63,9 +63,9 @@ const UPS = function(request) {
     };
 
     this.modifyUserPropertyByAccountName = (data) => {
-        var headers = {};
-        var soapBody = '';
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let headers = {};
+        let soapBody = '';
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -127,14 +127,14 @@ const UPS = function(request) {
     /* REST */
 
     this.getPropertiesFor = (data) => {
-        var methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
+        let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
             `/getpropertiesfor(` +
                 `accountName='${encodeURIComponent(data.accountName)}')`;
         return request.get(methodUrl);
     };
 
     this.getUserProfilePropertyFor = (data) => {
-        var methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
+        let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
             `/getuserprofilepropertyfor(` +
                 `accountName='${encodeURIComponent(data.accountName)}',` +
                 `propertyname='${data.propertyName}')`;
@@ -144,7 +144,7 @@ const UPS = function(request) {
     /* HTTP */
 
     this.setSingleValueProfileProperty = (data) => {
-        var requestTemplate = Handlebars.compile(util.trimMultiline(`
+        let requestTemplate = Handlebars.compile(util.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <ObjectPath Id="71" ObjectPathId="70" />
@@ -165,8 +165,8 @@ const UPS = function(request) {
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
 
-                var headers = {};
-                var requestBody = '';
+                let headers = {};
+                let requestBody = '';
 
                 requestBody = requestTemplate(data);
 
@@ -185,7 +185,7 @@ const UPS = function(request) {
     };
 
     this.setMultiValuedProfileProperty = (data) => {
-        var requestTemplate = Handlebars.compile(util.trimMultiline(`
+        let requestTemplate = Handlebars.compile(util.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <ObjectPath Id="82" ObjectPathId="81" />
@@ -210,8 +210,8 @@ const UPS = function(request) {
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
 
-                var headers = {};
-                var requestBody = '';
+                let headers = {};
+                let requestBody = '';
 
                 requestBody = requestTemplate(data);
 

@@ -57,6 +57,10 @@ This library implements (or at least tries) some vital capabilities by wrapping 
 
 - getVersionCollection (SOAP, /_vti_bin/lists.asmx)
 
+#### Item property bags
+
+- setItemProperties (HTTP, /_vti_bin/client.svc/ProcessQuery)
+
 ### Possible SOAP services to implement
 
 - Alerts (/_vti_bin/alerts.asmx)

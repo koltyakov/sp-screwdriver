@@ -6,13 +6,13 @@ const MMD = function(request) {
     /* SOAP */
 
     this.getTermSets = (data) => {
-        var headers = {};
-        var soapBody = '';
+        let headers = {};
+        let soapBody = '';
 
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -73,13 +73,13 @@ const MMD = function(request) {
     };
 
     this.getChildTermsInTermSet = (data) => {
-        var headers = {};
-        var soapBody = '';
+        let headers = {};
+        let soapBody = '';
 
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -107,13 +107,13 @@ const MMD = function(request) {
     };
 
     this.getChildTermsInTerm = (data) => {
-        var headers = {};
-        var soapBody = '';
+        let headers = {};
+        let soapBody = '';
 
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -142,13 +142,13 @@ const MMD = function(request) {
     };
 
     this.getTermsByLabel = (data) => {
-        var headers = {};
-        var soapBody = '';
+        let headers = {};
+        let soapBody = '';
 
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -197,13 +197,13 @@ const MMD = function(request) {
     };
 
     this.getKeywordTermsByGuids = (data) => {
-        var headers = {};
-        var soapBody = '';
+        let headers = {};
+        let soapBody = '';
 
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -242,13 +242,13 @@ const MMD = function(request) {
     };
 
     this.addTerms = (data) => {
-        var headers = {};
-        var soapBody = '';
+        let headers = {};
+        let soapBody = '';
 
         data.lcid = data.lcid || 1033;
         data.version = data.version || 1;
 
-        var soapTemplate = Handlebars.compile(util.trimMultiline(`
+        let soapTemplate = Handlebars.compile(util.trimMultiline(`
             <?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                 <soap:Body>
@@ -306,7 +306,7 @@ const MMD = function(request) {
             </Properties>
         `;
 
-        var requestTemplate = Handlebars.compile(util.trimMultiline(`
+        let requestTemplate = Handlebars.compile(util.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <Query Id="78" ObjectPathId="76">
@@ -339,8 +339,8 @@ const MMD = function(request) {
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
 
-                var headers = {};
-                var requestBody = '';
+                let headers = {};
+                let requestBody = '';
 
                 requestBody = requestTemplate(data);
 
@@ -364,7 +364,7 @@ const MMD = function(request) {
 
     this.setTermName = (data) => {
 
-        var requestTemplate = Handlebars.compile(util.trimMultiline(`
+        let requestTemplate = Handlebars.compile(util.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <SetProperty Id="166" ObjectPathId="157" Name="Name">
@@ -396,8 +396,8 @@ const MMD = function(request) {
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
 
-                var headers = {};
-                var requestBody = '';
+                let headers = {};
+                let requestBody = '';
 
                 requestBody = requestTemplate(data);
 
@@ -417,7 +417,7 @@ const MMD = function(request) {
 
     this.deprecateTerm = (data) => {
 
-        var requestTemplate = Handlebars.compile(util.trimMultiline(`
+        let requestTemplate = Handlebars.compile(util.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <Method Name="Deprecate" Id="41" ObjectPathId="32">
@@ -451,8 +451,8 @@ const MMD = function(request) {
         return request.requestDigest(data.baseUrl)
             .then(function(digest) {
 
-                var headers = {};
-                var requestBody = '';
+                let headers = {};
+                let requestBody = '';
 
                 if (typeof data.deprecate === "undefined") {
                     data.deprecate = true;
