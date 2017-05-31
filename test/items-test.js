@@ -1,10 +1,10 @@
 const path = require('path');
-const cpass = new (require('cpass'));
+const cpass = new (require('cpass')).Cpass();
 // const parseString = require('xml2js').parseString;
 
 const Screwdriver = require(__dirname + "/../src/index");
 
-let configPath = path.join(__dirname + "/config/_private.conf.json");
+let configPath = path.join(__dirname + "/config/private.json");
 let config = require(configPath);
 let context = config.context;
 if (context.password) {
