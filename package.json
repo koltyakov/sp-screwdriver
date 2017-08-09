@@ -1,10 +1,11 @@
 {
   "name": "sp-screwdriver",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node.js Screwdriver for SharePoint",
   "main": "./src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "upgrade": "ncu --upgrade --upgradeAll && yarn upgrade"
   },
   "repository": {
     "type": "git",
@@ -24,8 +25,8 @@
   },
   "homepage": "https://github.com/koltyakov/sp-screwdriver#readme",
   "dependencies": {
-    "handlebars": "^4.0.6",
-    "sp-request": "^2.0.3"
+    "handlebars": "^4.0.10",
+    "sp-request": "^2.1.0"
   },
   "devDependencies": {
     "cpass": "^2.0.0",
