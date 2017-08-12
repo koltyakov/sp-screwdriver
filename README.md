@@ -1,7 +1,5 @@
 # Screwdriver for SharePoint
 
-> Beta | Not for production (!) | Experimental sandbox
-
 [![NPM](https://nodei.co/npm/sp-screwdriver.png?mini=true&downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/sp-screwdriver/)
 
 [![npm version](https://badge.fury.io/js/sp-screwdriver.svg)](https://badge.fury.io/js/sp-screwdriver)
@@ -14,6 +12,12 @@
 SharePoint REST API is cool, but there are cases, then it's limited or even absent (e.g. MMD is not reachable trough REST API). 
 
 This library implements (or at least tries) some vital capabilities by wrapping legacy but still working SOAP services and by hacking HTTP requests mimicing JSOM/CSOM.
+
+## New in version 1.0.0
+
+- Code base is completely migrated to TypeScript.
+- node-sp-auth-config is integrated to the library.
+- Integration tests are added.
 
 ## Supported SharePoint versions:
 - SharePoint Online
