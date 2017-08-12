@@ -8,7 +8,7 @@ declare let global: any;
 
 for (let testConfig of TestsConfigs) {
 
-    describe(`Run 'Items' tests in ${testConfig.environmentName}`, () => {
+    describe(`Run 'Authentication' test in ${testConfig.environmentName}`, () => {
 
         let screw: Screwdriver;
         let params: ITestConfig;
@@ -25,15 +25,16 @@ for (let testConfig of TestsConfigs) {
             }).catch(done);
         });
 
-        it(`should set item's property bags via CSOM`, function(done: MochaDone): void {
+        it(`should auth to SharePoint`, function(done: MochaDone): void {
             this.timeout(30 * 1000);
-            screw.items.setItemProperties({
-                itemId: params.items.itemId,
-                listPath: params.items.listPath,
-                properties: params.items.properties
-            }).then(result => {
+            const ctx = new SP.ClientContext(_spPageContextInfo.webServerRelativeUrl);
+            const oWeb = ctx.get_web();
+            ctx.load(oWeb);
+            ctx.executeQueryAsync(() => {
                 done();
-            }).catch(done);
+            }, (sender, args) => {
+                done(args.get_message());
+            });
         });
 
     });

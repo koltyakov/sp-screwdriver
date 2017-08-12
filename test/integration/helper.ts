@@ -4,12 +4,12 @@ import { Cpass } from 'cpass';
 
 import { JsomNode, IJsomNodeSettings } from 'sp-jsom-node';
 import { Screwdriver, IScrewdriverSetting } from './../../src';
-import { IEnvironmentConfig } from './../configs';
+import { IEnvironmentConfig, ITestConfig } from './../interfaces';
 
 const cpass = new Cpass();
 
 export const initScrewdriver = (testConfig: IEnvironmentConfig): Screwdriver => {
-    let config: any = require(path.resolve(testConfig.configPath));
+    let config: any = require(path.resolve(testConfig.authConfigPath));
     config.password = config.password && cpass.decode(config.password);
 
     let screwdriverSettings: IScrewdriverSetting = {
@@ -23,7 +23,7 @@ export const initScrewdriver = (testConfig: IEnvironmentConfig): Screwdriver => 
 };
 
 export const initJsom = (testConfig: IEnvironmentConfig): void => {
-    let config = require(path.resolve(testConfig.configPath));
+    let config = require(path.resolve(testConfig.authConfigPath));
     config.password = config.password && cpass.decode(config.password);
 
     let jsomNodeSettings: IJsomNodeSettings = {
@@ -32,4 +32,11 @@ export const initJsom = (testConfig: IEnvironmentConfig): void => {
     };
 
     (new JsomNode(jsomNodeSettings)).init();
+};
+
+export const getTestConfigs = (testConfig: IEnvironmentConfig): Promise<ITestConfig> => {
+    let modulePath: string = `./../config/${testConfig.paramsConfigPath}`;
+    return import(modulePath).then(conf => {
+        return conf.testConfigs;
+    });
 };
