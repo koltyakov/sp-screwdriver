@@ -11,9 +11,9 @@ export async function checkOrPromptForIntegrationConfigCreds(): Promise<void> {
     for (let testConfig of Environments) {
         console.log(`\n=== ${colors.bold.yellow(`${testConfig.environmentName} Credentials`)} ===\n`);
         await (new SPAuthConfigirator({
-            configPath: testConfig.configPath
+            configPath: testConfig.authConfigPath
         })).getContext();
-        console.log(colors.grey(`Gotcha ${path.resolve(testConfig.configPath)}`));
+        console.log(colors.grey(`Gotcha ${path.resolve(testConfig.authConfigPath)}`));
     }
 
     console.log('\n');
