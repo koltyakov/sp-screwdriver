@@ -1,6 +1,7 @@
 node_modules
-config/private.json
-test/config/*.*
-!test/config/private.sample.json
+config/**/private.json
+config/**/private.*.json
 npm-debug.*
 debug.log
+dist
+tmp
