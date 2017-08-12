@@ -5,6 +5,8 @@ import { IGetTermSetsParams, IGetChildTermsInTermSetParams, IGetChildTermsInTerm
          IGetTermsByLabelParams, IGetKeywordTermsByGuidsParams, IAddTermsParams,
          IGetAllTermsParams, ISetTermNameParams, IDeprecateTermsParams } from './../interfaces/IMmd';
 
+import { ITermSetsResponse, ITerm } from './../interfaces/IMmd';
+
 export class MMD {
 
     private request: ISPRequest;
@@ -14,11 +16,12 @@ export class MMD {
     constructor(request: ISPRequest, baseUrl?: string) {
         this.request = request;
         this.utils = new Utils();
+        this.baseUrl = baseUrl;
     }
 
     /* SOAP */
 
-    public getTermSets = (data: IGetTermSetsParams) => {
+    public getTermSets = (data: IGetTermSetsParams): Promise<ITermSetsResponse> => {
 
         data.baseUrl = data.baseUrl || this.baseUrl;
 
@@ -30,59 +33,71 @@ export class MMD {
         data.clientTimeStamp = data.clientTimeStamp || (new Date()).toISOString();
         data.clientVersion = data.clientVersion || 1;
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetTermSets xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
-                        <sharedServiceIds>
-                            &lt;sspIds&gt;
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetTermSets xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                <sharedServiceIds>
+                    ${
+                        this.utils.toInnerXmlPackage(`
+                            <sspIds>
                                 ${
-                                    data.sspIds.reduce((res: string, sspId) => {
+                                    [data.sspId].reduce((res: string, sspId) => {
                                         res += `
-                                            &lt;sspId&gt;
+                                            <sspId>
                                                 ${sspId}
-                                            &lt;/sspId&gt;
+                                            </sspId>
                                         `;
                                         return res;
                                     }, '')
                                 }
-                            &lt;/sspIds&gt;
-                        </sharedServiceIds>
-                        <termSetIds>
-                            &lt;termSetIds&gt;
+                            </sspIds>
+                        `)
+                    }
+                </sharedServiceIds>
+                <termSetIds>
+                    ${
+                        this.utils.toInnerXmlPackage(`
+                            <termSetIds>
                                 ${
-                                    data.termSetIds.reduce((res: string, termSetId) => {
+                                    [data.termSetId].reduce((res: string, termSetId) => {
                                         res += `
-                                            &lt;termSetId&gt;
+                                            <termSetId>
                                                 ${termSetId}
-                                            &lt;/termSetId&gt;
+                                            </termSetId>
                                         `;
                                         return res;
                                     }, '')
                                 }
-                            &lt;/termSetIds&gt;
-                        </termSetIds>
-                        <lcid>${data.lcid}</lcid>
-                        <clientTimeStamps>
-                            &lt;dateTimes&gt;&lt;dateTime&gt;
-                                ${data.clientTimeStamp}
-                            &lt;/dateTime&gt;&lt;/dateTimes&gt;
-                        </clientTimeStamps>
-                        <clientVersions>
-                            &lt;versions&gt;&lt;version&gt;
-                                ${data.clientVersion}
-                            &lt;/version&gt;&lt;/versions&gt;
-                        </clientVersions>
-                    </GetTermSets>
-                </soap:Body>
-            </soap:Envelope>
+                            </termSetIds>
+                        `)
+                    }
+                </termSetIds>
+                <lcid>${data.lcid}</lcid>
+                <clientTimeStamps>
+                    ${
+                        this.utils.toInnerXmlPackage(`
+                            <dateTimes>
+                                <dateTime>
+                                    ${data.clientTimeStamp}
+                                </dateTime>
+                            </dateTimes>
+                        `)
+                    }
+                </clientTimeStamps>
+                <clientVersions>
+                    ${
+                        this.utils.toInnerXmlPackage(`
+                            <versions>
+                                <version>
+                                    ${data.clientVersion}
+                                </version>
+                            </versions>
+                        `)
+                    }
+                </clientVersions>
+            </GetTermSets>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
             headers,
@@ -91,11 +106,16 @@ export class MMD {
         }).then(response => {
             return this.utils.parseXml(response.body);
         }).then(result => {
-            return result['soap:Envelope']['soap:Body'][0].GetTermSetsResponse[0];
-        });
+            return this.utils.parseXml(
+                result['soap:Envelope']['soap:Body'][0]
+                    .GetTermSetsResponse[0].GetTermSetsResult[0]
+            );
+        }).then(result => {
+            return result.Container.TermStore;
+        }).then(this.mapTermSetFromSoapResponse);
     }
 
-    public getChildTermsInTermSet = (data: IGetChildTermsInTermSetParams) => {
+    public getChildTermsInTermSet = (data: IGetChildTermsInTermSetParams): Promise<ITerm[]> => {
 
         data.baseUrl = data.baseUrl || this.baseUrl;
 
@@ -105,23 +125,15 @@ export class MMD {
 
         data.lcid = data.lcid || 1033;
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetChildTermsInTermSet xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
-                        <sspId>${data.sspId}</sspId>
-                        <lcid>${data.lcid}</lcid>
-                        <termSetId>${data.termSetId}</termSetId>
-                    </GetChildTermsInTermSet>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetChildTermsInTermSet xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                <sspId>${data.sspId}</sspId>
+                <lcid>${data.lcid}</lcid>
+                <termSetId>${data.termSetId}</termSetId>
+            </GetChildTermsInTermSet>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
             headers,
@@ -134,7 +146,9 @@ export class MMD {
                 result['soap:Envelope']['soap:Body'][0]
                     .GetChildTermsInTermSetResponse[0].GetChildTermsInTermSetResult[0]
             );
-        }).then(terms => terms.TermStore);
+        }).then(terms => {
+            return this.mapTermsFromSoapResponse(terms.TermStore.T);
+        });
     }
 
     public getChildTermsInTerm = (data: IGetChildTermsInTermParams) => {
@@ -147,24 +161,16 @@ export class MMD {
 
         data.lcid = data.lcid || 1033;
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetChildTermsInTerm xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
-                        <sspId>${data.sspId}</sspId>
-                        <lcid>${data.lcid}</lcid>
-                        <termId>${data.termId}</termId>
-                        <termSetId>${data.termSetId}</termSetId>
-                    </GetChildTermsInTerm>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetChildTermsInTerm xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                <sspId>${data.sspId}</sspId>
+                <lcid>${data.lcid}</lcid>
+                <termId>${data.termId}</termId>
+                <termSetId>${data.termSetId}</termSetId>
+            </GetChildTermsInTerm>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
             headers,
@@ -177,7 +183,9 @@ export class MMD {
                 result['soap:Envelope']['soap:Body'][0]
                     .GetChildTermsInTermResponse[0].GetChildTermsInTermResult[0]
             );
-        }).then(terms => terms.TermStore);
+        }).then(terms => {
+            return this.mapTermsFromSoapResponse(terms.TermStore.T);
+        });
     }
 
     public getTermsByLabel = (data: IGetTermsByLabelParams) => {
@@ -194,39 +202,35 @@ export class MMD {
         data.resultCollectionSize = data.resultCollectionSize || 25;
         data.addIfNotFound = typeof data.addIfNotFound === 'undefined' ? false : data.addIfNotFound;
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetTermsByLabel xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
-                        <label>${data.label}</label>
-                        <lcid>${data.lcid}</lcid>
-                        <matchOption>${data.matchOption}</matchOption>
-                        <resultCollectionSize>${data.resultCollectionSize}</resultCollectionSize>
-                        <termIds>
-                            &lt;termIds&gt;
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetTermsByLabel xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                <label>${data.label}</label>
+                <lcid>${data.lcid}</lcid>
+                <matchOption>${data.matchOption}</matchOption>
+                <resultCollectionSize>${data.resultCollectionSize}</resultCollectionSize>
+                <termIds>
+                    ${
+                        this.utils.toInnerXmlPackage(`
+                            <termIds>
                                 ${
                                     data.termIds.reduce((res: string, termId) => {
                                         res += `
-                                            &lt;termId&gt;
+                                            <termId>
                                                 ${termId}
-                                            &lt;/termId&gt;
+                                            </termId>
                                         `;
                                         return res;
                                     }, '')
                                 }
-                            &lt;/termIds&gt;
-                        </termIds>
-                        <addIfNotFound>${data.addIfNotFound}</addIfNotFound>
-                    </GetTermsByLabel>
-                </soap:Body>
-            </soap:Envelope>
+                            </termIds>
+                        `)
+                    }
+                </termIds>
+                <addIfNotFound>${data.addIfNotFound}</addIfNotFound>
+            </GetTermsByLabel>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
             headers,
@@ -239,7 +243,9 @@ export class MMD {
                 result['soap:Envelope']['soap:Body'][0]
                     .GetTermsByLabelResponse[0].GetTermsByLabelResult[0]
             );
-        }).then(terms => terms.TermStore);
+        }).then(terms => {
+            return this.mapTermsFromSoapResponse(terms.TermStore.T);
+        });
     }
 
     public getKeywordTermsByGuids = (data: IGetKeywordTermsByGuidsParams) => {
@@ -252,35 +258,31 @@ export class MMD {
 
         data.lcid = data.lcid || 1033;
 
-        let soapBody = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetKeywordTermsByGuids xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
-                        <termIds>
-                            &lt;termIds&gt;
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetKeywordTermsByGuids xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                <termIds>
+                    ${
+                        this.utils.toInnerXmlPackage(`
+                            <termIds>
                                 ${
                                     data.termIds.reduce((res: string, termId) => {
                                         res += `
-                                            &lt;termId&gt;
+                                            <termId>
                                                 ${termId}
-                                            &lt;/termId&gt;
+                                            </termId>
                                         `;
                                         return res;
                                     }, '')
                                 }
-                            &lt;/termIds&gt;
-                        </termIds>
-                        <lcid>${data.lcid}</lcid>
-                    </GetKeywordTermsByGuids>
-                </soap:Body>
-            </soap:Envelope>
+                            </termIds>
+                        `)
+                    }
+                </termIds>
+                <lcid>${data.lcid}</lcid>
+            </GetKeywordTermsByGuids>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
             headers,
@@ -293,7 +295,9 @@ export class MMD {
                 result['soap:Envelope']['soap:Body'][0]
                     .GetKeywordTermsByGuidsResponse[0].GetKeywordTermsByGuidsResult[0]
             );
-        }).then(terms => terms.TermStore);
+        }).then(terms => {
+            return this.mapTermsFromSoapResponse(terms.TermStore.T);
+        });
     }
 
     public addTerms = (data: IAddTermsParams) => {
@@ -304,37 +308,40 @@ export class MMD {
             throw new Error('Site URL should be defined');
         }
 
+        data.newTerms = data.newTerms.map(term => {
+            return {
+                ...term,
+                parentTermId: term.parentTermId || '00000000-0000-0000-0000-000000000000'
+            };
+        });
+
         data.lcid = data.lcid || 1033;
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <AddTerms xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
-                        <sharedServiceId>${data.sspId}</sharedServiceId>
-                        <termSetId>${data.termSetId}</termSetId>
-                        <lcid>${data.lcid}</lcid>
-                        <newTerms>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <AddTerms xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
+                <sharedServiceId>${data.sspId}</sharedServiceId>
+                <termSetId>${data.termSetId}</termSetId>
+                <lcid>${data.lcid}</lcid>
+                <newTerms>
+                    ${
+                        this.utils.toInnerXmlPackage(`
                             <newTerms>
                                 ${
                                     data.newTerms.reduce((res: string, newTerm) => {
-                                        res += `
-                                            <newTerm label="${newTerm.label}" clientId="1" parentTermId="${newTerm.parentTermId}"></newTerm>
-                                        `;
+                                        res += `<newTerm label="${newTerm.label}" ` +
+                                               `clientId="1" parentTermId="${newTerm.parentTermId}">` +
+                                               `</newTerm>`;
                                         return res;
                                     }, '')
                                 }
                             </newTerms>
-                        </newTerms>
-                    </AddTerms>
-                </soap:Body>
-            </soap:Envelope>
+                        `)
+                    }
+                </newTerms>
+            </AddTerms>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
             headers,
@@ -342,6 +349,13 @@ export class MMD {
             json: false
         }).then(response => {
             return this.utils.parseXml(response.body);
+        }).then(result => {
+            return this.utils.parseXml(
+                result['soap:Envelope']['soap:Body'][0]
+                    .AddTermsResponse[0].AddTermsResult[0]
+            );
+        }).then(terms => {
+            return this.mapTermsFromSoapResponse(terms.TermStore.T);
         });
     }
 
@@ -365,10 +379,11 @@ export class MMD {
                             <Properties />
                         </Query>
                         <ChildItemQuery SelectAllProperties="true">
-                            <Properties>
-                                ${
-                                    (data.properties.length === 0) ?
-                                        `<Properties />` :
+                            ${
+                                (data.properties.length === 0) ?
+                                `<Properties />` :
+                                `<Properties>
+                                    ${
                                         data.properties.reduce((res: string, propName) => {
                                             if (propName === 'Parent') {
                                                 res += `
@@ -385,8 +400,9 @@ export class MMD {
                                             }
                                             return res;
                                         }, '')
-                                }
-                            </Properties>
+                                    }
+                                </Properties>`
+                            }
                         </ChildItemQuery>
                     </Query>
                 </Actions>
@@ -411,15 +427,18 @@ export class MMD {
         return <any>this.request.requestDigest(data.baseUrl)
             .then(digest => {
 
-                let headers: Headers = this.utils.csomHeaders(requestBody, digest);
+                let headers: any = this.utils.csomHeaders(requestBody, digest);
 
                 return <any>this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
                     headers,
                     body: requestBody,
                     json: false
                 }).then(response => {
-                    let results = JSON.parse(response.body);
-                    return results[results.length - 1]._Child_Items_;
+                    let result: any = JSON.parse(response.body);
+                    if (result[0].ErrorInfo !== null) {
+                        throw new Error(JSON.stringify(result[0].ErrorInfo));
+                    }
+                    return result[result.length - 1]._Child_Items_;
                 });
             });
     }
@@ -464,14 +483,18 @@ export class MMD {
         return <any>this.request.requestDigest(data.baseUrl)
             .then(digest => {
 
-                let headers: Headers = this.utils.csomHeaders(requestBody, digest);
+                let headers: any = this.utils.csomHeaders(requestBody, digest);
 
                 return <any>this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
                     headers,
                     body: requestBody,
                     json: false
                 }).then(response => {
-                    return response.body;
+                    let result: any = JSON.parse(response.body);
+                    if (result[0].ErrorInfo !== null) {
+                        throw new Error(JSON.stringify(result[0].ErrorInfo));
+                    }
+                    return true;
                 });
             });
     }
@@ -486,7 +509,7 @@ export class MMD {
 
         data.deprecate = typeof data.deprecate === 'undefined' ? true : data.deprecate;
 
-        let requestBody = this.utils.trimMultiline(`
+        let requestBody: string = this.utils.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
                     <Method Name="Deprecate" Id="41" ObjectPathId="32">
@@ -518,22 +541,52 @@ export class MMD {
         `);
 
         return <any>this.request.requestDigest(data.baseUrl)
-            .then(function(digest) {
+            .then(digest => {
 
                 if (typeof data.deprecate === 'undefined') {
                     data.deprecate = true;
                 }
 
-                let headers: Headers = this.utils.csomHeaders(requestBody, digest);
+                let headers: any = this.utils.csomHeaders(requestBody, digest);
 
                 return <any>this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
                     headers,
                     body: requestBody,
                     json: false
                 }).then(response => {
-                    return response.body;
+                    let result: any = JSON.parse(response.body);
+                    if (result[0].ErrorInfo !== null) {
+                        throw new Error(JSON.stringify(result[0].ErrorInfo));
+                    }
+                    return true;
                 });
             });
+    }
+
+    // Data mapping
+
+    private mapTermSetFromSoapResponse = (soap: any): ITermSetsResponse => {
+        return {
+            termSet: {
+                name: soap[0].TS[0].$.a12,
+                id: soap[0].TS[0].$.a9,
+                _raw: soap[0].TS[0]
+            },
+            terms: this.mapTermsFromSoapResponse(soap[0].T)
+        };
+    }
+
+    private mapTermsFromSoapResponse = (soap: any[] = []): ITerm[] => {
+        return soap.map(t => {
+            return {
+                name: t.LS[0].TL[0].$.a32,
+                id: t.$.a9,
+                enableForTagging: t.TMS[0].TM[0].$.a17,
+                parentId: t.TMS[0].TM[0].$.a25,
+                termSetId: t.TMS[0].TM[0].$.a24,
+                _raw: t
+            };
+        });
     }
 
 }

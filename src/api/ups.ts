@@ -5,6 +5,8 @@ import { IGetUserProfileByNameProperties, IModifyUserPropertyByAccountNameProper
          IGetUserProfilePropertyForProperties, IGetPropertiesForProperties, ISetSingleValueProfilePropertyProperties,
          ISetMultiValuedProfilePropertyProperties, INewPropData } from './../interfaces/IUps';
 
+import { IUserProp } from './../interfaces/IUps';
+
 export class UPS {
 
     private request: ISPRequest;
@@ -14,11 +16,12 @@ export class UPS {
     constructor(request: ISPRequest, baseUrl?: string) {
         this.request = request;
         this.utils = new Utils();
+        this.baseUrl = baseUrl;
     }
 
     /* SOAP */
 
-    public getUserProfileByName = (data: IGetUserProfileByNameProperties) => {
+    public getUserProfileByName = (data: IGetUserProfileByNameProperties): Promise<IUserProp> => {
 
         data.baseUrl = data.baseUrl || this.baseUrl;
 
@@ -26,21 +29,13 @@ export class UPS {
             throw new Error('Site URL should be defined');
         }
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetUserProfileByName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
-                        <AccountName>${data.accountName}</AccountName>
-                    </GetUserProfileByName>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetUserProfileByName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+                <AccountName>${data.accountName}</AccountName>
+            </GetUserProfileByName>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
             headers,
@@ -51,6 +46,8 @@ export class UPS {
         }).then(result => {
             return result['soap:Envelope']['soap:Body'][0]
                 .GetUserProfileByNameResponse[0].GetUserProfileByNameResult[0];
+        }).then(props => {
+            return props.PropertyData.map(this.mapUserPropertiesFromSoapResponse);
         });
     }
 
@@ -62,22 +59,14 @@ export class UPS {
             throw new Error('Site URL should be defined');
         }
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
-                        <accountName>${data.accountName}</accountName>
-                        <propertyName>${data.propertyName}</propertyName>
-                    </GetUserPropertyByAccountName>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+                <accountName>${data.accountName}</accountName>
+                <propertyName>${data.propertyName}</propertyName>
+            </GetUserPropertyByAccountName>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
             headers,
@@ -88,6 +77,8 @@ export class UPS {
         }).then(result => {
             return result['soap:Envelope']['soap:Body'][0]
                 .GetUserPropertyByAccountNameResponse[0].GetUserPropertyByAccountNameResult[0];
+        }).then(props => {
+            return this.mapUserPropertiesFromSoapResponse(props);
         });
     }
 
@@ -101,60 +92,58 @@ export class UPS {
 
         data.newData = data.newData.map(newData => {
             return <INewPropData>{
+                ...newData,
                 privacy: newData.privacy || 'NotSet',
                 isPrivacyChanged: typeof newData.isPrivacyChanged === 'undefined' ? false : newData.isPrivacyChanged,
                 isValueChanged: typeof newData.isValueChanged === 'undefined' ? true : newData.isValueChanged
             };
         });
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <ModifyUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
-                        <accountName>${data.accountName}</accountName>
-                        <newData>
-                            ${
-                                data.newData.reduce((res: string, prop) => {
-                                    res += `
-                                        <PropertyData>
-                                            <IsPrivacyChanged>${prop.isPrivacyChanged}</IsPrivacyChanged>
-                                            <IsValueChanged>${prop.isValueChanged}</IsValueChanged>
-                                            <Name>${prop.name}</Name>
-                                            <Privacy>${prop.privacy}</Privacy>
-                                            <Values>
-                                                ${
-                                                    prop.values.reduce((propRes: string, propVal) => {
-                                                        propRes += `
-                                                            <ValueData>
-                                                                <Value xsi:type="xsd:string">${propVal}</Value>
-                                                            </ValueData>
-                                                        `;
-                                                        return propRes;
-                                                    }, '')
-                                                }
-                                            </Values>
-                                        </PropertyData>
-                                    `;
-                                    return res;
-                                }, '')
-                            }
-                        </newData>
-                    </ModifyUserPropertyByAccountName>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <ModifyUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+                <accountName>${data.accountName}</accountName>
+                <newData>
+                    ${
+                        this.utils.toInnerXmlPackage(data.newData.reduce((res: string, prop) => {
+                            res += `
+                                <PropertyData>
+                                    <IsPrivacyChanged>${prop.isPrivacyChanged}</IsPrivacyChanged>
+                                    <IsValueChanged>${prop.isValueChanged}</IsValueChanged>
+                                    <Name>${prop.name}</Name>
+                                    <Privacy>${prop.privacy}</Privacy>
+                                    <Values>
+                                        ${
+                                            prop.values.reduce((propRes: string, propVal) => {
+                                                propRes += `
+                                                    <ValueData>
+                                                        <Value xsi:type="xsd:string">${propVal}</Value>
+                                                    </ValueData>
+                                                `;
+                                                return propRes;
+                                            }, '')
+                                        }
+                                    </Values>
+                                </PropertyData>
+                            `;
+                            return res;
+                        }, ''))
+                    }
+                </newData>
+            </ModifyUserPropertyByAccountName>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
             headers,
             body: soapBody,
             json: false
-        }).then(response => response.body);
+        }).then(response => {
+            return this.utils.parseXml(response.body);
+        }).then(result => {
+            return result['soap:Envelope']['soap:Body'][0]
+                .ModifyUserPropertyByAccountNameResponse;
+        });
     }
 
     /* REST */
@@ -170,7 +159,8 @@ export class UPS {
         let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
             `/getpropertiesfor(` +
                 `accountName='${encodeURIComponent(data.accountName)}')`;
-        return <any>this.request.get(methodUrl);
+        return <any>this.request.get(methodUrl)
+            .then(response => response.body);
     }
 
     public getUserProfilePropertyFor = (data: IGetUserProfilePropertyForProperties) => {
@@ -185,7 +175,8 @@ export class UPS {
             `/getuserprofilepropertyfor(` +
                 `accountName='${encodeURIComponent(data.accountName)}',` +
                 `propertyname='${data.propertyName}')`;
-        return <any>this.request.get(methodUrl);
+        return <any>this.request.get(methodUrl)
+            .then(response => response.body.d);
     }
 
     /* HTTP */
@@ -219,13 +210,19 @@ export class UPS {
         return <any>this.request.requestDigest(data.baseUrl)
             .then(digest => {
 
-                let headers: Headers = this.utils.csomHeaders(requestBody, digest);
+                let headers: any = this.utils.csomHeaders(requestBody, digest);
 
                 return <any>this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
                     headers,
                     body: requestBody,
                     json: false
-                }).then(response => response.body);
+                }).then(response => {
+                    let result: any = JSON.parse(response.body);
+                    if (result[0].ErrorInfo !== null) {
+                        throw new Error(JSON.stringify(result[0].ErrorInfo));
+                    }
+                    return true;
+                });
             });
     }
 
@@ -267,14 +264,32 @@ export class UPS {
         return <any>this.request.requestDigest(data.baseUrl)
             .then(digest => {
 
-                let headers: Headers = this.utils.csomHeaders(requestBody, digest);
+                let headers: any = this.utils.csomHeaders(requestBody, digest);
 
                 return <any>this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
                     headers,
                     body: requestBody,
                     json: false
-                }).then(response => response.body);
+                }).then(response => {
+                    let result: any = JSON.parse(response.body);
+                    if (result[0].ErrorInfo !== null) {
+                        throw new Error(JSON.stringify(result[0].ErrorInfo));
+                    }
+                    return true;
+                });
             });
+    }
+
+    // Data mapping
+
+    private mapUserPropertiesFromSoapResponse = (prop: any): IUserProp => {
+        return {
+            name: prop.Name[0],
+            values: prop.Values[0] !== '' ? prop.Values[0].ValueData.map(v => v._).filter(v => v !== null) : null,
+            privacy: prop.Privacy[0],
+            isPrivacyChanged: prop.IsPrivacyChanged[0] === 'true' ? true : false,
+            isValueChanged: prop.IsValueChanged[0] === 'true' ? true : false
+        };
     }
 
 }

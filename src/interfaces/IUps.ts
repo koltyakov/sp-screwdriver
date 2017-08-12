@@ -48,3 +48,11 @@ export interface ISetMultiValuedProfilePropertyProperties {
     propertyName: string;
     propertyValues: string[];
 }
+
+export interface IUserProp {
+    name: string;
+    values: any[];
+    privacy: string;
+    isPrivacyChanged: boolean;
+    isValueChanged: boolean;
+}

@@ -33,6 +33,12 @@ export class Items {
         data.updateId = sequenceId;
         data.queryId = sequenceId + 1;
 
+        // listPath can be relative
+        let relUrl = this.utils.relativeFromAbsoluteUrl(data.baseUrl);
+        if (data.listPath.indexOf(relUrl) === -1) {
+            data.listPath = `${relUrl}/${data.listPath}`.replace(/\/\//g, '/');
+        }
+
         let requestBody: string = this.utils.trimMultiline(`
             <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
                 <Actions>
@@ -85,14 +91,18 @@ export class Items {
         return <any>this.request.requestDigest(data.baseUrl)
             .then((digest) => {
 
-                let headers: Headers = this.utils.csomHeaders(requestBody, digest);
+                let headers: any = this.utils.csomHeaders(requestBody, digest);
 
                 return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
                     headers,
                     body: requestBody,
                     json: false
                 }).then(response => {
-                    return JSON.parse(response.body)[2];
+                    let result: any = JSON.parse(response.body);
+                    if (result[0].ErrorInfo !== null) {
+                        throw new Error(JSON.stringify(result[0].ErrorInfo));
+                    }
+                    return result[result.length - 1];
                 });
 
             });
