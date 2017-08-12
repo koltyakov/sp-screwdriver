@@ -14,3 +14,4 @@ gulpfile.json
 tsconfig.json
 tslint.json
 tmp
+examples
