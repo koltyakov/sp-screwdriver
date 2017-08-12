@@ -2,8 +2,27 @@ import { parseString } from 'xml2js';
 
 export class Utils {
 
+    public soapEnvelope = (body: string): string => {
+        const envelopMeta: string = 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+                                    'xmlns:xsd="http://www.w3.org/2001/XMLSchema" ' +
+                                    'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"';
+
+        return this.trimMultiline(`
+            <?xml version="1.0" encoding="utf-8"?>
+            <soap:Envelope ${envelopMeta}>
+                <soap:Body>
+                    ${body}
+                </soap:Body>
+            </soap:Envelope>
+        `);
+    }
+
     public trimMultiline = (multiline) => {
-        return multiline.split('\n').map(line => line.trim()).join('');
+        return multiline
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .join('').trim();
     }
 
     public parseXml = (xmlString: string): Promise<any> => {
@@ -17,27 +36,31 @@ export class Utils {
         });
     }
 
-    public soapHeaders = (soapBody: string): Headers => {
-        let headers: Headers = new Headers();
-
-        headers.set('Accept', 'application/xml, text/xml, */*; q=0.01');
-        headers.set('Content-Type', 'text/xml;charset="UTF-8"');
-        headers.set('X-Requested-With', 'XMLHttpRequest');
-        headers.set('Content-Length', soapBody.length.toString());
-
-        return headers;
+    public soapHeaders = (soapBody: string): any => {
+        return {
+            'Accept': 'application/xml, text/xml, */*; q=0.01',
+            'Content-Type': 'text/xml;charset="UTF-8"',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Length': soapBody.length
+        };
     }
 
-    public csomHeaders = (requestBody: string, digest: string): Headers => {
-        let headers: Headers = new Headers();
+    public csomHeaders = (requestBody: string, digest: string): any => {
+        return {
+            'Accept': '*/*',
+            'Content-Type': 'text/xml;charset="UTF-8"',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Length': requestBody.length,
+            'X-RequestDigest': digest
+        };
+    }
 
-        headers.set('Accept', '*/*');
-        headers.set('Content-Type', 'text/xml;charset="UTF-8"');
-        headers.set('X-Requested-With', 'XMLHttpRequest');
-        headers.set('Content-Length', requestBody.length.toString());
-        headers.set('X-RequestDigest', digest);
+    public relativeFromAbsoluteUrl = (absoluteUrl: string): string => {
+        return `/${absoluteUrl.replace('://', '').split('/').splice(1, 100).join('/')}`;
+    }
 
-        return headers;
+    public toInnerXmlPackage = (xml: string): string => {
+        return xml.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
 }

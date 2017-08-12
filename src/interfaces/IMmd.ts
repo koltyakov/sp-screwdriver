@@ -1,11 +1,31 @@
 export interface IGetTermSetsParams {
     baseUrl?: string;
-    sspIds: string[];
-    termSetIds: string[];
+    sspId: string;
+    termSetId: string;
 
     lcid?: number;
     clientTimeStamp?: string;
     clientVersion?: number;
+}
+
+export interface ITermSet {
+    name: string;
+    id: string;
+    _raw: any;
+}
+
+export interface ITerm {
+    name: string;
+    id: string;
+    enableForTagging: boolean;
+    parentId: string;
+    termSetId: string;
+    _raw: any;
+}
+
+export interface ITermSetsResponse {
+    termSet: ITermSet;
+    terms: ITerm[];
 }
 
 export interface IGetChildTermsInTermSetParams {
@@ -45,7 +65,7 @@ export interface IGetKeywordTermsByGuidsParams {
 
 export interface INewTerm {
     label: string;
-    parentTermId: string;
+    parentTermId?: string;
 }
 
 export interface IAddTermsParams {

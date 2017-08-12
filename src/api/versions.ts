@@ -12,6 +12,7 @@ export class Versions {
     constructor(request: ISPRequest, baseUrl?: string) {
         this.request = request;
         this.utils = new Utils();
+        this.baseUrl = baseUrl;
     }
 
     // GetVersionCollection - for lists items
@@ -26,20 +27,13 @@ export class Versions {
             throw new Error('Site URL should be defined');
         }
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetVersions xmlns="http://schemas.microsoft.com/sharepoint/soap/">
-                        <fileName>${data.fileName}</fileName>
-                    </GetVersions>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetVersions xmlns="http://schemas.microsoft.com/sharepoint/soap/">
+                <fileName>${data.fileName}</fileName>
+            </GetVersions>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/versions.asmx`, {
             headers,
@@ -50,9 +44,14 @@ export class Versions {
         }).then(result => {
             return result['soap:Envelope']['soap:Body'][0]
                 .GetVersionsResponse[0].GetVersionsResult[0].results[0].result;
+        }).then(result => {
+            return result.map(ver => {
+                return ver.$;
+            });
         });
     }
 
+    // Do not work?
     public deleteAllVersions = (data: IDocumentVersions) => {
 
         data.baseUrl = data.baseUrl || this.baseUrl;
@@ -61,21 +60,13 @@ export class Versions {
             throw new Error('Site URL should be defined');
         }
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <DeleteAllVersions xmlns="http://schemas.microsoft.com/sharepoint/soap/">
-                        <fileName>${data.fileName}</fileName>
-                    </DeleteAllVersions>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <DeleteAllVersions xmlns="http://schemas.microsoft.com/sharepoint/soap/">
+                <fileName>${data.fileName}</fileName>
+            </DeleteAllVersions>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/versions.asmx`, {
             headers,
@@ -86,6 +77,7 @@ export class Versions {
         }); // ToDo: results path
     }
 
+    // Do not work?
     public deleteVersion = (data: IDocumentVersion) => {
 
         data.baseUrl = data.baseUrl || this.baseUrl;
@@ -94,22 +86,14 @@ export class Versions {
             throw new Error('Site URL should be defined');
         }
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <DeleteVersion xmlns="http://schemas.microsoft.com/sharepoint/soap/">
-                        <fileName>${data.fileName}</fileName>
-                        <fileVersion>${data.fileVersion}</fileVersion>
-                    </DeleteVersion>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <DeleteVersion xmlns="http://schemas.microsoft.com/sharepoint/soap/">
+                <fileName>${data.fileName}</fileName>
+                <fileVersion>${data.fileVersion}</fileVersion>
+            </DeleteVersion>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/versions.asmx`, {
             headers,
@@ -120,6 +104,7 @@ export class Versions {
         }); // ToDo: results path
     }
 
+    // Do not work?
     public restoreVersion = (data: IDocumentVersion) => {
 
         data.baseUrl = data.baseUrl || this.baseUrl;
@@ -128,22 +113,14 @@ export class Versions {
             throw new Error('Site URL should be defined');
         }
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <RestoreVersion xmlns="http://schemas.microsoft.com/sharepoint/soap/">
-                        <fileName>${data.fileName}</fileName>
-                        <fileVersion>${data.fileVersion}</fileVersion>
-                    </RestoreVersion>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <RestoreVersion xmlns="http://schemas.microsoft.com/sharepoint/soap/">
+                <fileName>${data.fileName}</fileName>
+                <fileVersion>${data.fileVersion}</fileVersion>
+            </RestoreVersion>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/versions.asmx`, {
             headers,
@@ -164,23 +141,15 @@ export class Versions {
             throw new Error('Site URL should be defined');
         }
 
-        let soapBody: string = this.utils.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                <soap:Body>
-                    <GetVersionCollection xmlns="http://schemas.microsoft.com/sharepoint/soap/">
-                        <strlistID>${data.listId}</strlistID>
-                        <strlistItemID>${data.itemId}</strlistItemID>
-                        <strFieldName>${data.fieldName}</strFieldName>
-                    </GetVersionCollection>
-                </soap:Body>
-            </soap:Envelope>
+        let soapBody: string = this.utils.soapEnvelope(`
+            <GetVersionCollection xmlns="http://schemas.microsoft.com/sharepoint/soap/">
+                <strlistID>${data.listId}</strlistID>
+                <strlistItemID>${data.itemId}</strlistItemID>
+                <strFieldName>${data.fieldName}</strFieldName>
+            </GetVersionCollection>
         `);
 
-        let headers: Headers = this.utils.soapHeaders(soapBody);
+        let headers: any = this.utils.soapHeaders(soapBody);
 
         return <any>this.request.post(`${data.baseUrl}/_vti_bin/lists.asmx`, {
             headers,
@@ -188,7 +157,12 @@ export class Versions {
             json: false
         }).then(response => {
             return this.utils.parseXml(response.body);
-        }); // ToDo: results path
+        }).then(result => {
+            return result['soap:Envelope']['soap:Body'][0]
+                .GetVersionCollectionResponse[0].GetVersionCollectionResult[0];
+        }).then(result => {
+            return result.Versions[0].Version.map(v => v.$);
+        });
     }
 
 }
