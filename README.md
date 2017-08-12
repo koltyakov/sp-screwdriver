@@ -24,6 +24,68 @@ This library implements (or at least tries) some vital capabilities by wrapping 
 - SharePoint 2013
 - SharePoint 2016
 
+## Usage
+
+### Install
+
+```bash
+npm install sp-screwdriver --save
+```
+
+or
+
+```bash
+yarn add sp-screwdriver
+```
+
+
+### Minimal setup
+
+```javascript
+import { Screwdriver, IScrewdriverSettings } from 'sp-screwdriver';
+
+const settings: IScrewdriverSettings = {
+    // ...
+};
+
+const screw = new Screwdriver(settings);
+
+// Wizard mode asks for credentials
+screw.wizard().then(() => {
+
+    screw.ups.getPropertiesFor({
+        accountName: 'i:0#.f|membership|username'
+    }).then(result => {
+        // ...
+    }).catch(console.log);
+
+    screw.mmd.getAllTerms({
+        serviceName: 'Taxonomy_5KSgChEZ9j15+7UVInQNRQ==',
+        termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f'
+    }).then(result => {
+        // ...
+    }).catch(console.log);
+
+});
+```
+
+alternative:
+
+```javascript
+import { Screwdriver } from 'sp-screwdriver';
+
+const screw = new Screwdriver(); // Default settings
+screw.init(); // private.json already should be on the disk
+              // or raw auth parameters should be provided
+
+screw.ups.getUserPropertyByAccountName({
+    accountName: 'i:0#.f|membership|username',
+    propertyName: 'SPS-Birthday'
+}).then(result => {
+    done();
+}).catch(done);
+```
+
 ## APIs
 
 ### User Profiles Service
