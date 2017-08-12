@@ -1,6 +1,6 @@
 import { Screwdriver } from '../../src';
 import { Environments as TestsConfigs } from '../configs';
-import { initScrewdriver, initJsom, getTestConfigs } from './helper';
+import { initScrewdriver, initJsom, getTestConfigs } from './../helper';
 import { ITestConfig } from '../interfaces';
 
 

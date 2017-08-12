@@ -3,8 +3,8 @@ import * as path from 'path';
 import { Cpass } from 'cpass';
 
 import { JsomNode, IJsomNodeSettings } from 'sp-jsom-node';
-import { Screwdriver, IScrewdriverSetting } from './../../src';
-import { IEnvironmentConfig, ITestConfig } from './../interfaces';
+import { Screwdriver, IScrewdriverSetting } from './../src';
+import { IEnvironmentConfig, ITestConfig } from './interfaces';
 
 const cpass = new Cpass();
 

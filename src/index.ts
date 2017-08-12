@@ -5,7 +5,7 @@ import { AuthConfig as SPAuthConfigirator } from 'node-sp-auth-config';
 import { create as createRequest, ISPRequest } from 'sp-request';
 import { Cpass } from 'cpass';
 
-import { IScrewdriverSetting } from './interfaces/IScrewdriver';
+import { IScrewdriverSettings } from './interfaces/IScrewdriver';
 
 import { UPS } from './api/ups';
 import { MMD } from './api/mmd';
@@ -19,12 +19,12 @@ export class Screwdriver {
     public versions: Versions;
     public items: Items;
 
-    private settings: IScrewdriverSetting;
+    private settings: IScrewdriverSettings;
     private spAuthConfigirator: SPAuthConfigirator;
     private request: ISPRequest;
     private agent: https.Agent;
 
-    constructor(settings: IScrewdriverSetting = {}) {
+    constructor(settings: IScrewdriverSettings = {}) {
         let config = settings.config || {};
         this.settings = {
             ...settings,
@@ -59,7 +59,7 @@ export class Screwdriver {
     }
 
     // Trigger wizard and init Screwdriver environment
-    public wizard(): Promise<IScrewdriverSetting> {
+    public wizard(): Promise<IScrewdriverSettings> {
         return new Promise((resolve, reject) => {
             if (typeof this.settings.authOptions === 'undefined') {
                 this.spAuthConfigirator.getContext()
@@ -85,4 +85,4 @@ export class Screwdriver {
 
 }
 
-export { IScrewdriverSetting } from './interfaces/IScrewdriver';
+export { IScrewdriverSettings } from './interfaces/IScrewdriver';
