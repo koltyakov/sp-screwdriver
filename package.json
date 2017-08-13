@@ -1,8 +1,9 @@
 {
   "name": "sp-screwdriver",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Node.js Screwdriver for SharePoint",
   "main": "./dist/index.js",
+  "typings": "./dist/index",
   "scripts": {
     "build": "gulp tsc",
     "test": "ts-node ./test/init && mocha --opts test/mocha.opts || ECHO.",
