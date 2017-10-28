@@ -4,12 +4,9 @@
 
 [![npm version](https://badge.fury.io/js/sp-screwdriver.svg)](https://badge.fury.io/js/sp-screwdriver)
 [![Downloads](https://img.shields.io/npm/dm/sp-screwdriver.svg)](https://www.npmjs.com/package/sp-screwdriver)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/sharepoint-node/Lobby)
 
 ![logo](https://github.com/koltyakov/sp-screwdriver/blob/master/doc/img/screwdriver-logo.png?raw=true)
-
----
-### Need help on SharePoint with Node.js? Join our gitter chat and ask question! [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/sharepoint-node/Lobby)
----
 
 > Adds missing and abstracts SharePoint APIs for transparent usage in Node.js applications
 
