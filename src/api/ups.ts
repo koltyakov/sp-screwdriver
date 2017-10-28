@@ -1,295 +1,296 @@
 import { ISPRequest } from 'sp-request';
 import { Utils } from './../utils';
 
-import { IGetUserProfileByNameProperties, IModifyUserPropertyByAccountNameProperties, IGetUserPropertyByAccountNameProperties,
-         IGetUserProfilePropertyForProperties, IGetPropertiesForProperties, ISetSingleValueProfilePropertyProperties,
-         ISetMultiValuedProfilePropertyProperties, INewPropData } from './../interfaces/IUps';
-
-import { IUserProp } from './../interfaces/IUps';
+import {
+  IGetUserProfileByNameProperties, IModifyUserPropertyByAccountNameProperties, IGetUserPropertyByAccountNameProperties,
+  IGetUserProfilePropertyForProperties, IGetPropertiesForProperties, ISetSingleValueProfilePropertyProperties,
+  ISetMultiValuedProfilePropertyProperties, INewPropData,
+  IUserProp
+} from './../interfaces/IUps';
 
 export class UPS {
 
-    private request: ISPRequest;
-    private utils: Utils;
-    private baseUrl: string;
+  private request: ISPRequest;
+  private utils: Utils;
+  private baseUrl: string;
 
-    constructor(request: ISPRequest, baseUrl?: string) {
-        this.request = request;
-        this.utils = new Utils();
-        this.baseUrl = baseUrl;
+  constructor (request: ISPRequest, baseUrl?: string) {
+    this.request = request;
+    this.utils = new Utils();
+    this.baseUrl = baseUrl;
+  }
+
+  /* SOAP */
+
+  public getUserProfileByName = (data: IGetUserProfileByNameProperties): Promise<IUserProp> => {
+
+    data.baseUrl = data.baseUrl || this.baseUrl;
+
+    if (typeof data.baseUrl === 'undefined') {
+      throw new Error('Site URL should be defined');
     }
 
-    /* SOAP */
+    let soapBody: string = this.utils.soapEnvelope(`
+      <GetUserProfileByName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+        <AccountName>${data.accountName}</AccountName>
+      </GetUserProfileByName>
+    `);
 
-    public getUserProfileByName = (data: IGetUserProfileByNameProperties): Promise<IUserProp> => {
+    let headers: any = this.utils.soapHeaders(soapBody);
 
-        data.baseUrl = data.baseUrl || this.baseUrl;
+    return this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
+      headers,
+      body: soapBody,
+      json: false
+    }).then(response => {
+      return this.utils.parseXml(response.body);
+    }).then(result => {
+      return result['soap:Envelope']['soap:Body'][0]
+        .GetUserProfileByNameResponse[0].GetUserProfileByNameResult[0];
+    }).then(props => {
+      return props.PropertyData.map(this.mapUserPropertiesFromSoapResponse);
+    }) as any;
+  }
 
-        if (typeof data.baseUrl === 'undefined') {
-            throw new Error('Site URL should be defined');
-        }
+  public getUserPropertyByAccountName = (data: IGetUserPropertyByAccountNameProperties) => {
 
-        let soapBody: string = this.utils.soapEnvelope(`
-            <GetUserProfileByName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
-                <AccountName>${data.accountName}</AccountName>
-            </GetUserProfileByName>
-        `);
+    data.baseUrl = data.baseUrl || this.baseUrl;
 
-        let headers: any = this.utils.soapHeaders(soapBody);
+    if (typeof data.baseUrl === 'undefined') {
+      throw new Error('Site URL should be defined');
+    }
 
-        return <any>this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
-            headers,
-            body: soapBody,
-            json: false
+    let soapBody: string = this.utils.soapEnvelope(`
+      <GetUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+        <accountName>${data.accountName}</accountName>
+        <propertyName>${data.propertyName}</propertyName>
+      </GetUserPropertyByAccountName>
+    `);
+
+    let headers: any = this.utils.soapHeaders(soapBody);
+
+    return this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
+      headers,
+      body: soapBody,
+      json: false
+    }).then(response => {
+      return this.utils.parseXml(response.body);
+    }).then(result => {
+      return result['soap:Envelope']['soap:Body'][0]
+        .GetUserPropertyByAccountNameResponse[0].GetUserPropertyByAccountNameResult[0];
+    }).then(props => {
+      return this.mapUserPropertiesFromSoapResponse(props);
+    }) as any;
+  }
+
+  public modifyUserPropertyByAccountName = (data: IModifyUserPropertyByAccountNameProperties) => {
+
+    data.baseUrl = data.baseUrl || this.baseUrl;
+
+    if (typeof data.baseUrl === 'undefined') {
+      throw new Error('Site URL should be defined');
+    }
+
+    data.newData = data.newData.map(newData => {
+      return {
+        ...newData,
+        privacy: newData.privacy || 'NotSet',
+        isPrivacyChanged: typeof newData.isPrivacyChanged === 'undefined' ? false : newData.isPrivacyChanged,
+        isValueChanged: typeof newData.isValueChanged === 'undefined' ? true : newData.isValueChanged
+      } as INewPropData;
+    });
+
+    let soapBody: string = this.utils.soapEnvelope(`
+      <ModifyUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
+          <accountName>${data.accountName}</accountName>
+          <newData>
+              ${
+              this.utils.toInnerXmlPackage(data.newData.reduce((res: string, prop) => {
+                res += `
+                  <PropertyData>
+                    <IsPrivacyChanged>${prop.isPrivacyChanged}</IsPrivacyChanged>
+                    <IsValueChanged>${prop.isValueChanged}</IsValueChanged>
+                    <Name>${prop.name}</Name>
+                    <Privacy>${prop.privacy}</Privacy>
+                    <Values>
+                      ${
+                      prop.values.reduce((propRes: string, propVal) => {
+                        propRes += `
+                          <ValueData>
+                            <Value xsi:type="xsd:string">${propVal}</Value>
+                          </ValueData>
+                        `;
+                        return propRes;
+                      }, '')
+                      }
+                    </Values>
+                  </PropertyData>
+                `;
+                return res;
+              }, ''))
+              }
+          </newData>
+      </ModifyUserPropertyByAccountName>
+    `);
+
+    let headers: any = this.utils.soapHeaders(soapBody);
+
+    return this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
+      headers,
+      body: soapBody,
+      json: false
+    }).then(response => {
+      return this.utils.parseXml(response.body);
+    }).then(result => {
+      return result['soap:Envelope']['soap:Body'][0]
+        .ModifyUserPropertyByAccountNameResponse;
+    }) as any;
+  }
+
+  /* REST */
+
+  public getPropertiesFor = (data: IGetPropertiesForProperties) => {
+
+    data.baseUrl = data.baseUrl || this.baseUrl;
+
+    if (typeof data.baseUrl === 'undefined') {
+      throw new Error('Site URL should be defined');
+    }
+
+    let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
+      `/getpropertiesfor(` +
+      `accountName='${encodeURIComponent(data.accountName)}')`;
+    return this.request.get(methodUrl)
+      .then(response => response.body) as any;
+  }
+
+  public getUserProfilePropertyFor = (data: IGetUserProfilePropertyForProperties) => {
+
+    data.baseUrl = data.baseUrl || this.baseUrl;
+
+    if (typeof data.baseUrl === 'undefined') {
+      throw new Error('Site URL should be defined');
+    }
+
+    let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
+      `/getuserprofilepropertyfor(` +
+      `accountName='${encodeURIComponent(data.accountName)}',` +
+      `propertyname='${data.propertyName}')`;
+    return this.request.get(methodUrl)
+      .then(response => response.body.d) as any;
+  }
+
+  /* HTTP */
+
+  public setSingleValueProfileProperty = (data: ISetSingleValueProfilePropertyProperties) => {
+
+    data.baseUrl = data.baseUrl || this.baseUrl;
+
+    if (typeof data.baseUrl === 'undefined') {
+      throw new Error('Site URL should be defined');
+    }
+
+    let requestBody: string = this.utils.trimMultiline(`
+      <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+        <Actions>
+          <ObjectPath Id="71" ObjectPathId="70" />
+          <Method Name="SetSingleValueProfileProperty" Id="72" ObjectPathId="70">
+            <Parameters>
+              <Parameter Type="String">${data.accountName}</Parameter>
+              <Parameter Type="String">${data.propertyName}</Parameter>
+              <Parameter Type="String">${data.propertyValue}</Parameter>
+            </Parameters>
+          </Method>
+        </Actions>
+        <ObjectPaths>
+          <Constructor Id="70" TypeId="{cf560d69-0fdb-4489-a216-b6b47adf8ef8}" />
+        </ObjectPaths>
+      </Request>
+    `);
+
+    return this.request.requestDigest(data.baseUrl)
+      .then(digest => {
+
+        let headers: any = this.utils.csomHeaders(requestBody, digest);
+
+        return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
+          headers,
+          body: requestBody,
+          json: false
         }).then(response => {
-            return this.utils.parseXml(response.body);
-        }).then(result => {
-            return result['soap:Envelope']['soap:Body'][0]
-                .GetUserProfileByNameResponse[0].GetUserProfileByNameResult[0];
-        }).then(props => {
-            return props.PropertyData.map(this.mapUserPropertiesFromSoapResponse);
-        });
+          let result: any = JSON.parse(response.body);
+          if (result[0].ErrorInfo !== null) {
+            throw new Error(JSON.stringify(result[0].ErrorInfo));
+          }
+          return true;
+        }) as any;
+      }) as any;
+  }
+
+  public setMultiValuedProfileProperty = (data: ISetMultiValuedProfilePropertyProperties) => {
+
+    data.baseUrl = data.baseUrl || this.baseUrl;
+
+    if (typeof data.baseUrl === 'undefined') {
+      throw new Error('Site URL should be defined');
     }
 
-    public getUserPropertyByAccountName = (data: IGetUserPropertyByAccountNameProperties) => {
+    let requestBody: string = this.utils.trimMultiline(`
+      <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
+        <Actions>
+          <ObjectPath Id="82" ObjectPathId="81" />
+          <Method Name="SetMultiValuedProfileProperty" Id="83" ObjectPathId="81">
+            <Parameters>
+              <Parameter Type="String">${data.accountName}</Parameter>
+              <Parameter Type="String">${data.propertyName}</Parameter>
+              <Parameter Type="Array">
+                ${
+                data.propertyValues.reduce((res: string, propVal) => {
+                  res += `
+                    <Object Type="String">${propVal}</Object>
+                  `;
+                  return res;
+                }, '')
+                }
+              </Parameter>
+            </Parameters>
+          </Method>
+        </Actions>
+        <ObjectPaths>
+          <Constructor Id="81" TypeId="{cf560d69-0fdb-4489-a216-b6b47adf8ef8}" />
+        </ObjectPaths>
+      </Request>
+    `);
 
-        data.baseUrl = data.baseUrl || this.baseUrl;
+    return this.request.requestDigest(data.baseUrl)
+      .then(digest => {
 
-        if (typeof data.baseUrl === 'undefined') {
-            throw new Error('Site URL should be defined');
-        }
+        let headers: any = this.utils.csomHeaders(requestBody, digest);
 
-        let soapBody: string = this.utils.soapEnvelope(`
-            <GetUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
-                <accountName>${data.accountName}</accountName>
-                <propertyName>${data.propertyName}</propertyName>
-            </GetUserPropertyByAccountName>
-        `);
-
-        let headers: any = this.utils.soapHeaders(soapBody);
-
-        return <any>this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
-            headers,
-            body: soapBody,
-            json: false
+        return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
+          headers,
+          body: requestBody,
+          json: false
         }).then(response => {
-            return this.utils.parseXml(response.body);
-        }).then(result => {
-            return result['soap:Envelope']['soap:Body'][0]
-                .GetUserPropertyByAccountNameResponse[0].GetUserPropertyByAccountNameResult[0];
-        }).then(props => {
-            return this.mapUserPropertiesFromSoapResponse(props);
-        });
-    }
+          let result: any = JSON.parse(response.body);
+          if (result[0].ErrorInfo !== null) {
+            throw new Error(JSON.stringify(result[0].ErrorInfo));
+          }
+          return true;
+        }) as any;
+      }) as any;
+  }
 
-    public modifyUserPropertyByAccountName = (data: IModifyUserPropertyByAccountNameProperties) => {
+  // Data mapping
 
-        data.baseUrl = data.baseUrl || this.baseUrl;
-
-        if (typeof data.baseUrl === 'undefined') {
-            throw new Error('Site URL should be defined');
-        }
-
-        data.newData = data.newData.map(newData => {
-            return <INewPropData>{
-                ...newData,
-                privacy: newData.privacy || 'NotSet',
-                isPrivacyChanged: typeof newData.isPrivacyChanged === 'undefined' ? false : newData.isPrivacyChanged,
-                isValueChanged: typeof newData.isValueChanged === 'undefined' ? true : newData.isValueChanged
-            };
-        });
-
-        let soapBody: string = this.utils.soapEnvelope(`
-            <ModifyUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
-                <accountName>${data.accountName}</accountName>
-                <newData>
-                    ${
-                        this.utils.toInnerXmlPackage(data.newData.reduce((res: string, prop) => {
-                            res += `
-                                <PropertyData>
-                                    <IsPrivacyChanged>${prop.isPrivacyChanged}</IsPrivacyChanged>
-                                    <IsValueChanged>${prop.isValueChanged}</IsValueChanged>
-                                    <Name>${prop.name}</Name>
-                                    <Privacy>${prop.privacy}</Privacy>
-                                    <Values>
-                                        ${
-                                            prop.values.reduce((propRes: string, propVal) => {
-                                                propRes += `
-                                                    <ValueData>
-                                                        <Value xsi:type="xsd:string">${propVal}</Value>
-                                                    </ValueData>
-                                                `;
-                                                return propRes;
-                                            }, '')
-                                        }
-                                    </Values>
-                                </PropertyData>
-                            `;
-                            return res;
-                        }, ''))
-                    }
-                </newData>
-            </ModifyUserPropertyByAccountName>
-        `);
-
-        let headers: any = this.utils.soapHeaders(soapBody);
-
-        return <any>this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
-            headers,
-            body: soapBody,
-            json: false
-        }).then(response => {
-            return this.utils.parseXml(response.body);
-        }).then(result => {
-            return result['soap:Envelope']['soap:Body'][0]
-                .ModifyUserPropertyByAccountNameResponse;
-        });
-    }
-
-    /* REST */
-
-    public getPropertiesFor = (data: IGetPropertiesForProperties) => {
-
-        data.baseUrl = data.baseUrl || this.baseUrl;
-
-        if (typeof data.baseUrl === 'undefined') {
-            throw new Error('Site URL should be defined');
-        }
-
-        let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
-            `/getpropertiesfor(` +
-                `accountName='${encodeURIComponent(data.accountName)}')`;
-        return <any>this.request.get(methodUrl)
-            .then(response => response.body);
-    }
-
-    public getUserProfilePropertyFor = (data: IGetUserProfilePropertyForProperties) => {
-
-        data.baseUrl = data.baseUrl || this.baseUrl;
-
-        if (typeof data.baseUrl === 'undefined') {
-            throw new Error('Site URL should be defined');
-        }
-
-        let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
-            `/getuserprofilepropertyfor(` +
-                `accountName='${encodeURIComponent(data.accountName)}',` +
-                `propertyname='${data.propertyName}')`;
-        return <any>this.request.get(methodUrl)
-            .then(response => response.body.d);
-    }
-
-    /* HTTP */
-
-    public setSingleValueProfileProperty = (data: ISetSingleValueProfilePropertyProperties) => {
-
-        data.baseUrl = data.baseUrl || this.baseUrl;
-
-        if (typeof data.baseUrl === 'undefined') {
-            throw new Error('Site URL should be defined');
-        }
-
-        let requestBody: string = this.utils.trimMultiline(`
-            <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
-                <Actions>
-                    <ObjectPath Id="71" ObjectPathId="70" />
-                    <Method Name="SetSingleValueProfileProperty" Id="72" ObjectPathId="70">
-                        <Parameters>
-                            <Parameter Type="String">${data.accountName}</Parameter>
-                            <Parameter Type="String">${data.propertyName}</Parameter>
-                            <Parameter Type="String">${data.propertyValue}</Parameter>
-                        </Parameters>
-                    </Method>
-                </Actions>
-                <ObjectPaths>
-                    <Constructor Id="70" TypeId="{cf560d69-0fdb-4489-a216-b6b47adf8ef8}" />
-                </ObjectPaths>
-            </Request>
-        `);
-
-        return <any>this.request.requestDigest(data.baseUrl)
-            .then(digest => {
-
-                let headers: any = this.utils.csomHeaders(requestBody, digest);
-
-                return <any>this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
-                    headers,
-                    body: requestBody,
-                    json: false
-                }).then(response => {
-                    let result: any = JSON.parse(response.body);
-                    if (result[0].ErrorInfo !== null) {
-                        throw new Error(JSON.stringify(result[0].ErrorInfo));
-                    }
-                    return true;
-                });
-            });
-    }
-
-    public setMultiValuedProfileProperty = (data: ISetMultiValuedProfilePropertyProperties) => {
-
-        data.baseUrl = data.baseUrl || this.baseUrl;
-
-        if (typeof data.baseUrl === 'undefined') {
-            throw new Error('Site URL should be defined');
-        }
-
-        let requestBody: string = this.utils.trimMultiline(`
-            <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
-                <Actions>
-                    <ObjectPath Id="82" ObjectPathId="81" />
-                    <Method Name="SetMultiValuedProfileProperty" Id="83" ObjectPathId="81">
-                        <Parameters>
-                            <Parameter Type="String">${data.accountName}</Parameter>
-                            <Parameter Type="String">${data.propertyName}</Parameter>
-                            <Parameter Type="Array">
-                                ${
-                                    data.propertyValues.reduce((res: string, propVal) => {
-                                        res += `
-                                            <Object Type="String">${propVal}</Object>
-                                        `;
-                                        return res;
-                                    }, '')
-                                }
-                            </Parameter>
-                        </Parameters>
-                    </Method>
-                </Actions>
-                <ObjectPaths>
-                    <Constructor Id="81" TypeId="{cf560d69-0fdb-4489-a216-b6b47adf8ef8}" />
-                </ObjectPaths>
-            </Request>
-        `);
-
-        return <any>this.request.requestDigest(data.baseUrl)
-            .then(digest => {
-
-                let headers: any = this.utils.csomHeaders(requestBody, digest);
-
-                return <any>this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
-                    headers,
-                    body: requestBody,
-                    json: false
-                }).then(response => {
-                    let result: any = JSON.parse(response.body);
-                    if (result[0].ErrorInfo !== null) {
-                        throw new Error(JSON.stringify(result[0].ErrorInfo));
-                    }
-                    return true;
-                });
-            });
-    }
-
-    // Data mapping
-
-    private mapUserPropertiesFromSoapResponse = (prop: any): IUserProp => {
-        return {
-            name: prop.Name[0],
-            values: prop.Values[0] !== '' ? prop.Values[0].ValueData.map(v => v._).filter(v => v !== null) : null,
-            privacy: prop.Privacy[0],
-            isPrivacyChanged: prop.IsPrivacyChanged[0] === 'true' ? true : false,
-            isValueChanged: prop.IsValueChanged[0] === 'true' ? true : false
-        };
-    }
+  private mapUserPropertiesFromSoapResponse = (prop: any): IUserProp => {
+    return {
+      name: prop.Name[0],
+      values: prop.Values[0] !== '' ? prop.Values[0].ValueData.map(v => v._).filter(v => v !== null) : null,
+      privacy: prop.Privacy[0],
+      isPrivacyChanged: prop.IsPrivacyChanged[0] === 'true' ? true : false,
+      isValueChanged: prop.IsValueChanged[0] === 'true' ? true : false
+    };
+  }
 
 }
