@@ -6,5 +6,7 @@ docs/
 test/
 examples/
 .vscode/
+.github/
+.eslintrc
 tsconfig.json
 tslint.json
