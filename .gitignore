@@ -1,8 +1,4 @@
-node_modules
-config/**/private.json
-config/**/private.*.json
+node_modules/
+config/**/private.*
 test/config/**/private.*.ts
-npm-debug.*
-debug.log
-dist
-tmp
+dist/

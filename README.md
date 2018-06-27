@@ -10,7 +10,7 @@
 
 > Adds missing and abstracts SharePoint APIs for transparent usage in Node.js applications
 
-SharePoint REST API is cool, but there are cases, then it's limited or even absent (e.g. MMD is not reachable trough REST API). 
+SharePoint REST API is cool, but there are cases, then it's limited or even absent (e.g. MMD is not reachable trough REST API).
 
 This library implements (or at least tries) some vital capabilities by wrapping legacy but still working SOAP services and by hacking HTTP requests mimicing JSOM/CSOM.
 

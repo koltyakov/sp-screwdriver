@@ -7,6 +7,19 @@
     "declaration": true,
     "moduleResolution": "node",
     "noImplicitAny": false,
-    "removeComments": true
-  }
+    "removeComments": true,
+    "newLine": "LF",
+    "skipLibCheck": true,
+    "types": ["node", "sharepoint", "mocha"],
+    "outDir": "dist"
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test"
+  ]
 }
