@@ -8,13 +8,13 @@ export class Utils {
       'xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"';
 
     return this.trimMultiline(`
-            <?xml version="1.0" encoding="utf-8"?>
-            <soap:Envelope ${envelopMeta}>
-                <soap:Body>
-                    ${body}
-                </soap:Body>
-            </soap:Envelope>
-        `);
+      <?xml version="1.0" encoding="utf-8"?>
+      <soap:Envelope ${envelopMeta}>
+        <soap:Body>
+          ${body}
+        </soap:Body>
+      </soap:Envelope>
+    `);
   }
 
   public trimMultiline = (multiline) => {
@@ -40,8 +40,8 @@ export class Utils {
     return {
       'Accept': 'application/xml, text/xml, */*; q=0.01',
       'Content-Type': 'text/xml;charset="UTF-8"',
-      'X-Requested-With': 'XMLHttpRequest',
-      'Content-Length': soapBody.length
+      'X-Requested-With': 'XMLHttpRequest'
+      // 'Content-Length': soapBody.length
     };
   }
 
@@ -50,7 +50,7 @@ export class Utils {
       'Accept': '*/*',
       'Content-Type': 'text/xml;charset="UTF-8"',
       'X-Requested-With': 'XMLHttpRequest',
-      'Content-Length': requestBody.length,
+      // 'Content-Length': requestBody.length,
       'X-RequestDigest': digest
     };
   }
