@@ -10,3 +10,4 @@ examples/
 .eslintrc
 tsconfig.json
 tslint.json
+.env

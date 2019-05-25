@@ -1,4 +1,4 @@
-import { INewTerm } from './../../src/interfaces/IMmd';
+import { INewTerm } from '../src/interfaces/IMmd';
 
 export interface IEnvironmentConfig {
   environmentName: string;
