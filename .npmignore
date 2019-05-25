@@ -11,3 +11,4 @@ examples/
 tsconfig.json
 tslint.json
 .env
+azure-pipelines.yml
