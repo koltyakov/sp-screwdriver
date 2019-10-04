@@ -20,3 +20,8 @@ patch:
         patched: '2019-07-04T01:55:01.377Z'
     - sp-request > node-sp-auth > request-promise > request-promise-core > lodash:
         patched: '2019-07-04T01:55:01.377Z'
+  SNYK-JS-HTTPSPROXYAGENT-469131:
+    - snyk > proxy-agent > https-proxy-agent:
+        patched: '2019-10-04T01:54:58.619Z'
+    - snyk > proxy-agent > pac-proxy-agent > https-proxy-agent:
+        patched: '2019-10-04T01:54:58.619Z'
