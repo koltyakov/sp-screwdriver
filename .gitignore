@@ -1,5 +1,5 @@
 node_modules/
 config/**/private.*
-test/config/**/private.*.ts
+test/config/**/private.*
 dist/
 .env
