@@ -1,7 +1,8 @@
 {
-  "extends": "tslint-config-standard",
+  "extends": "tslint:latest",
   "rules": {
     "semicolon": [true, "always", "ignore-interfaces"],
-    "trailing-comma": true
+    "trailing-comma": true,
+    "arrow-parens": true
   }
 }

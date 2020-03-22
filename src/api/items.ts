@@ -26,7 +26,7 @@ export class Items {
       throw new Error('Site URL should be defined');
     }
 
-    data.properties.forEach(prop => {
+    data.properties.forEach((prop) => {
       prop.id = sequenceId;
       sequenceId += 1;
     });
@@ -34,12 +34,12 @@ export class Items {
     data.queryId = sequenceId + 1;
 
     // listPath can be relative
-    let relUrl = this.utils.relativeFromAbsoluteUrl(data.baseUrl);
+    const relUrl = this.utils.relativeFromAbsoluteUrl(data.baseUrl);
     if (data.listPath.indexOf(relUrl) === -1) {
       data.listPath = `${relUrl}/${data.listPath}`.replace(/\/\//g, '/');
     }
 
-    let requestBody: string = this.utils.trimMultiline(`
+    const requestBody: string = this.utils.trimMultiline(`
       <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
         <Actions>
           ${
@@ -91,14 +91,14 @@ export class Items {
     return this.request.requestDigest(data.baseUrl)
       .then((digest) => {
 
-        let headers: any = this.utils.csomHeaders(requestBody, digest);
+        const headers: any = this.utils.csomHeaders(requestBody, digest);
 
         return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
           headers,
           body: requestBody,
           json: false
-        }).then(response => {
-          let result: any = JSON.parse(response.body);
+        }).then((response) => {
+          const result: any = JSON.parse(response.body);
           if (result[0].ErrorInfo !== null) {
             throw new Error(JSON.stringify(result[0].ErrorInfo));
           }

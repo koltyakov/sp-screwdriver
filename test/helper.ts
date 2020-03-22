@@ -9,24 +9,24 @@ import { IEnvironmentConfig, ITestConfig } from './interfaces';
 const cpass = new Cpass();
 
 export const initScrewdriver = (testConfig: IEnvironmentConfig): Screwdriver => {
-  let config: any = require(path.resolve(testConfig.authConfigPath));
+  const config: any = require(path.resolve(testConfig.authConfigPath));
   config.password = config.password && cpass.decode(config.password);
 
-  let screwdriverSettings: IScrewdriverSettings = {
+  const screwdriverSettings: IScrewdriverSettings = {
     siteUrl: config.siteUrl,
     authOptions: config
   };
 
-  let screw = new Screwdriver(screwdriverSettings);
+  const screw = new Screwdriver(screwdriverSettings);
   screw.init();
   return screw;
 };
 
 export const initJsom = (testConfig: IEnvironmentConfig): void => {
-  let config = require(path.resolve(testConfig.authConfigPath));
+  const config = require(path.resolve(testConfig.authConfigPath));
   config.password = config.password && cpass.decode(config.password);
 
-  let jsomNodeSettings: IJsomNodeContext = {
+  const jsomNodeSettings: IJsomNodeContext = {
     siteUrl: config.siteUrl,
     authOptions: config
   };
@@ -35,7 +35,7 @@ export const initJsom = (testConfig: IEnvironmentConfig): void => {
 };
 
 export const getTestConfigs = (testConfig: IEnvironmentConfig): Promise<ITestConfig> => {
-  let modulePath: string = `./config/${testConfig.paramsConfigPath}`;
+  const modulePath: string = `./config/${testConfig.paramsConfigPath}`;
   return import(modulePath).then(conf => {
     return conf.testConfigs;
   });

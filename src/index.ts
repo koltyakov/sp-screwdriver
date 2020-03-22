@@ -25,7 +25,7 @@ export class Screwdriver {
   private agent: https.Agent;
 
   constructor (settings: IScrewdriverSettings = {}) {
-    let config = settings.config || {};
+    const config = settings.config || {};
     this.settings = {
       ...settings,
       config: {

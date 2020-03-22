@@ -3,9 +3,9 @@ import { Environments as TestsConfigs } from '../configs';
 import { initScrewdriver, initJsom, getTestConfigs } from './../helper';
 import { ITestConfig } from '../interfaces';
 
-declare let global: any;
+declare const global: any;
 
-for (let testConfig of TestsConfigs) {
+for (const testConfig of TestsConfigs) {
 
   describe(`Run 'UPS' tests in ${testConfig.environmentName}`, () => {
 
@@ -18,7 +18,7 @@ for (let testConfig of TestsConfigs) {
       screw = initScrewdriver(testConfig);
       initJsom(testConfig);
       _spPageContextInfo = global.window._spPageContextInfo;
-      getTestConfigs(testConfig).then(testParams => {
+      getTestConfigs(testConfig).then((testParams) => {
         params = testParams;
         done();
       }).catch(done);
@@ -28,7 +28,7 @@ for (let testConfig of TestsConfigs) {
       this.timeout(30 * 1000);
       screw.ups.getUserProfileByName({
         accountName: params.ups.accountName
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -38,7 +38,7 @@ for (let testConfig of TestsConfigs) {
       screw.ups.getUserPropertyByAccountName({
         accountName: params.ups.accountName,
         propertyName: 'SPS-Birthday'
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -54,7 +54,7 @@ for (let testConfig of TestsConfigs) {
           name: 'SPS-Birthday',
           values: ['10.03']
         }]
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -63,7 +63,7 @@ for (let testConfig of TestsConfigs) {
       this.timeout(30 * 1000);
       screw.ups.getPropertiesFor({
         accountName: params.ups.accountName
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -73,7 +73,7 @@ for (let testConfig of TestsConfigs) {
       screw.ups.getUserProfilePropertyFor({
         accountName: params.ups.accountName,
         propertyName: 'SPS-Birthday'
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -84,7 +84,7 @@ for (let testConfig of TestsConfigs) {
         accountName: params.ups.accountName,
         propertyName: 'SPS-Birthday',
         propertyValue: '10.03.1983'
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -95,7 +95,7 @@ for (let testConfig of TestsConfigs) {
         accountName: params.ups.accountName,
         propertyName: 'SPS-Department',
         propertyValues: ['Dep1']
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });

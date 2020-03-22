@@ -30,24 +30,24 @@ export class UPS {
       throw new Error('Site URL should be defined');
     }
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetUserProfileByName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
         <AccountName>${data.accountName}</AccountName>
       </GetUserProfileByName>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return result['soap:Envelope']['soap:Body'][0]
         .GetUserProfileByNameResponse[0].GetUserProfileByNameResult[0];
-    }).then(props => {
+    }).then((props) => {
       return props.PropertyData.map(this.mapUserPropertiesFromSoapResponse);
     }) as any;
   }
@@ -60,25 +60,25 @@ export class UPS {
       throw new Error('Site URL should be defined');
     }
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
         <accountName>${data.accountName}</accountName>
         <propertyName>${data.propertyName}</propertyName>
       </GetUserPropertyByAccountName>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return result['soap:Envelope']['soap:Body'][0]
         .GetUserPropertyByAccountNameResponse[0].GetUserPropertyByAccountNameResult[0];
-    }).then(props => {
+    }).then((props) => {
       return this.mapUserPropertiesFromSoapResponse(props);
     }) as any;
   }
@@ -91,16 +91,17 @@ export class UPS {
       throw new Error('Site URL should be defined');
     }
 
-    data.newData = data.newData.map(newData => {
-      return {
+    data.newData = data.newData.map((newData) => {
+      const r: INewPropData = {
         ...newData,
         privacy: newData.privacy || 'NotSet',
         isPrivacyChanged: typeof newData.isPrivacyChanged === 'undefined' ? false : newData.isPrivacyChanged,
         isValueChanged: typeof newData.isValueChanged === 'undefined' ? true : newData.isValueChanged
-      } as INewPropData;
+      };
+      return r;
     });
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <ModifyUserPropertyByAccountName xmlns="http://microsoft.com/webservices/SharePointPortalServer/UserProfileService">
           <accountName>${data.accountName}</accountName>
           <newData>
@@ -133,15 +134,15 @@ export class UPS {
       </ModifyUserPropertyByAccountName>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/UserProfileService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return result['soap:Envelope']['soap:Body'][0]
         .ModifyUserPropertyByAccountNameResponse;
     }) as any;
@@ -157,11 +158,11 @@ export class UPS {
       throw new Error('Site URL should be defined');
     }
 
-    let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
+    const methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
       `/getpropertiesfor(` +
       `accountName='${encodeURIComponent(data.accountName)}')`;
     return this.request.get(methodUrl)
-      .then(response => response.body) as any;
+      .then((response) => response.body) as any;
   }
 
   public getUserProfilePropertyFor = (data: IGetUserProfilePropertyForProperties) => {
@@ -172,12 +173,12 @@ export class UPS {
       throw new Error('Site URL should be defined');
     }
 
-    let methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
+    const methodUrl = `${data.baseUrl}/_api/sp.userprofiles.peoplemanager` +
       `/getuserprofilepropertyfor(` +
       `accountName='${encodeURIComponent(data.accountName)}',` +
       `propertyname='${data.propertyName}')`;
     return this.request.get(methodUrl)
-      .then(response => response.body.d) as any;
+      .then((response) => response.body.d) as any;
   }
 
   /* HTTP */
@@ -190,7 +191,7 @@ export class UPS {
       throw new Error('Site URL should be defined');
     }
 
-    let requestBody: string = this.utils.trimMultiline(`
+    const requestBody: string = this.utils.trimMultiline(`
       <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
         <Actions>
           <ObjectPath Id="71" ObjectPathId="70" />
@@ -209,16 +210,16 @@ export class UPS {
     `);
 
     return this.request.requestDigest(data.baseUrl)
-      .then(digest => {
+      .then((digest) => {
 
-        let headers: any = this.utils.csomHeaders(requestBody, digest);
+        const headers: any = this.utils.csomHeaders(requestBody, digest);
 
         return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
           headers,
           body: requestBody,
           json: false
-        }).then(response => {
-          let result: any = JSON.parse(response.body);
+        }).then((response) => {
+          const result: any = JSON.parse(response.body);
           if (result[0].ErrorInfo !== null) {
             throw new Error(JSON.stringify(result[0].ErrorInfo));
           }
@@ -235,7 +236,7 @@ export class UPS {
       throw new Error('Site URL should be defined');
     }
 
-    let requestBody: string = this.utils.trimMultiline(`
+    const requestBody: string = this.utils.trimMultiline(`
       <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
         <Actions>
           <ObjectPath Id="82" ObjectPathId="81" />
@@ -263,16 +264,16 @@ export class UPS {
     `);
 
     return this.request.requestDigest(data.baseUrl)
-      .then(digest => {
+      .then((digest) => {
 
-        let headers: any = this.utils.csomHeaders(requestBody, digest);
+        const headers: any = this.utils.csomHeaders(requestBody, digest);
 
         return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
           headers,
           body: requestBody,
           json: false
-        }).then(response => {
-          let result: any = JSON.parse(response.body);
+        }).then((response) => {
+          const result: any = JSON.parse(response.body);
           if (result[0].ErrorInfo !== null) {
             throw new Error(JSON.stringify(result[0].ErrorInfo));
           }
@@ -286,7 +287,7 @@ export class UPS {
   private mapUserPropertiesFromSoapResponse = (prop: any): IUserProp => {
     return {
       name: prop.Name[0],
-      values: prop.Values[0] !== '' ? prop.Values[0].ValueData.map(v => v._).filter(v => v !== null) : null,
+      values: prop.Values[0] !== '' ? prop.Values[0].ValueData.map((v) => v._).filter((v) => v !== null) : null,
       privacy: prop.Privacy[0],
       isPrivacyChanged: prop.IsPrivacyChanged[0] === 'true' ? true : false,
       isValueChanged: prop.IsValueChanged[0] === 'true' ? true : false

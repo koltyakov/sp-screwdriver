@@ -27,25 +27,25 @@ export class Versions {
       throw new Error('Site URL should be defined');
     }
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetVersions xmlns="http://schemas.microsoft.com/sharepoint/soap/">
         <fileName>${data.fileName}</fileName>
       </GetVersions>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/versions.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return result['soap:Envelope']['soap:Body'][0]
         .GetVersionsResponse[0].GetVersionsResult[0].results[0].result;
-    }).then(result => {
-      return result.map(ver => {
+    }).then((result) => {
+      return result.map((ver) => {
         return ver.$;
       });
     }) as any;
@@ -60,19 +60,19 @@ export class Versions {
       throw new Error('Site URL should be defined');
     }
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <DeleteAllVersions xmlns="http://schemas.microsoft.com/sharepoint/soap/">
         <fileName>${data.fileName}</fileName>
       </DeleteAllVersions>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/versions.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
     }) as any; // ToDo: results path
   }
@@ -86,20 +86,20 @@ export class Versions {
       throw new Error('Site URL should be defined');
     }
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <DeleteVersion xmlns="http://schemas.microsoft.com/sharepoint/soap/">
         <fileName>${data.fileName}</fileName>
         <fileVersion>${data.fileVersion}</fileVersion>
       </DeleteVersion>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/versions.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
     }) as any; // ToDo: results path
   }
@@ -113,20 +113,20 @@ export class Versions {
       throw new Error('Site URL should be defined');
     }
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <RestoreVersion xmlns="http://schemas.microsoft.com/sharepoint/soap/">
         <fileName>${data.fileName}</fileName>
         <fileVersion>${data.fileVersion}</fileVersion>
       </RestoreVersion>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/versions.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
     }) as any; // ToDo: results path
   }
@@ -141,7 +141,7 @@ export class Versions {
       throw new Error('Site URL should be defined');
     }
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetVersionCollection xmlns="http://schemas.microsoft.com/sharepoint/soap/">
         <strlistID>${data.listId}</strlistID>
         <strlistItemID>${data.itemId}</strlistItemID>
@@ -149,19 +149,19 @@ export class Versions {
       </GetVersionCollection>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/lists.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return result['soap:Envelope']['soap:Body'][0]
         .GetVersionCollectionResponse[0].GetVersionCollectionResult[0];
-    }).then(result => {
-      return result.Versions[0].Version.map(v => v.$);
+    }).then((result) => {
+      return result.Versions[0].Version.map((v) => v.$);
     }) as any;
   }
 

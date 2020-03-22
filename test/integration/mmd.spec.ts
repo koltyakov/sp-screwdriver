@@ -3,9 +3,9 @@ import { Environments as TestsConfigs } from '../configs';
 import { initScrewdriver, initJsom, getTestConfigs } from './../helper';
 import { ITestConfig } from '../interfaces';
 
-declare let global: any;
+declare const global: any;
 
-for (let testConfig of TestsConfigs) {
+for (const testConfig of TestsConfigs) {
 
   describe(`Run 'MMD' tests in ${testConfig.environmentName}`, () => {
 
@@ -18,7 +18,7 @@ for (let testConfig of TestsConfigs) {
       screw = initScrewdriver(testConfig);
       initJsom(testConfig);
       _spPageContextInfo = global.window._spPageContextInfo;
-      getTestConfigs(testConfig).then(testParams => {
+      getTestConfigs(testConfig).then((testParams) => {
         params = testParams;
         done();
       }).catch(done);
@@ -30,7 +30,7 @@ for (let testConfig of TestsConfigs) {
         sspId: params.mmd.sspId,
         termSetId: params.mmd.termSetId,
         lcid: params.mmd.lcid || 1033
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -41,7 +41,7 @@ for (let testConfig of TestsConfigs) {
         sspId: params.mmd.sspId,
         termSetId: params.mmd.termSetId,
         lcid: params.mmd.lcid || 1033
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -53,7 +53,7 @@ for (let testConfig of TestsConfigs) {
         termSetId: params.mmd.termSetId,
         termId: params.mmd.termId,
         lcid: params.mmd.lcid || 1033
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -64,7 +64,7 @@ for (let testConfig of TestsConfigs) {
         label: 'Dep1',
         termIds: [],
         lcid: params.mmd.lcid || 1033
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -74,7 +74,7 @@ for (let testConfig of TestsConfigs) {
       screw.mmd.getKeywordTermsByGuids({
         termIds: [params.mmd.termId],
         lcid: params.mmd.lcid || 1033
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -86,7 +86,7 @@ for (let testConfig of TestsConfigs) {
         termSetId: params.mmd.termSetId,
         newTerms: params.mmd.newTerms,
         lcid: params.mmd.lcid || 1033
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -96,7 +96,7 @@ for (let testConfig of TestsConfigs) {
       screw.mmd.getAllTerms({
         termSetId: params.mmd.termSetId,
         serviceName: params.mmd.serviceName
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -108,7 +108,7 @@ for (let testConfig of TestsConfigs) {
         termSetId: params.mmd.termSetId,
         termId: params.mmd.termId,
         newName: 'New name'
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });
@@ -120,7 +120,7 @@ for (let testConfig of TestsConfigs) {
         termSetId: params.mmd.termSetId,
         termId: params.mmd.termId,
         deprecate: true
-      }).then(result => {
+      }).then((result) => {
         done();
       }).catch(done);
     });

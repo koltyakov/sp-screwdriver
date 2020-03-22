@@ -34,7 +34,7 @@ export class MMD {
     data.clientTimeStamp = data.clientTimeStamp || (new Date()).toISOString();
     data.clientVersion = data.clientVersion || 1;
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetTermSets xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
         <sharedServiceIds>
           ${
@@ -98,20 +98,20 @@ export class MMD {
       </GetTermSets>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return this.utils.parseXml(
         result['soap:Envelope']['soap:Body'][0]
           .GetTermSetsResponse[0].GetTermSetsResult[0]
       );
-    }).then(result => {
+    }).then((result) => {
       return result.Container.TermStore;
     }).then(this.mapTermSetFromSoapResponse) as any;
   }
@@ -126,7 +126,7 @@ export class MMD {
 
     data.lcid = data.lcid || 1033;
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetChildTermsInTermSet xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
         <sspId>${data.sspId}</sspId>
         <lcid>${data.lcid}</lcid>
@@ -134,20 +134,20 @@ export class MMD {
       </GetChildTermsInTermSet>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return this.utils.parseXml(
         result['soap:Envelope']['soap:Body'][0]
           .GetChildTermsInTermSetResponse[0].GetChildTermsInTermSetResult[0]
       );
-    }).then(terms => {
+    }).then((terms) => {
       return this.mapTermsFromSoapResponse(terms.TermStore.T);
     }) as any;
   }
@@ -162,7 +162,7 @@ export class MMD {
 
     data.lcid = data.lcid || 1033;
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetChildTermsInTerm xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
         <sspId>${data.sspId}</sspId>
         <lcid>${data.lcid}</lcid>
@@ -171,20 +171,20 @@ export class MMD {
       </GetChildTermsInTerm>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return this.utils.parseXml(
         result['soap:Envelope']['soap:Body'][0]
           .GetChildTermsInTermResponse[0].GetChildTermsInTermResult[0]
       );
-    }).then(terms => {
+    }).then((terms) => {
       return this.mapTermsFromSoapResponse(terms.TermStore.T);
     }) as any;
   }
@@ -203,7 +203,7 @@ export class MMD {
     data.resultCollectionSize = data.resultCollectionSize || 25;
     data.addIfNotFound = typeof data.addIfNotFound === 'undefined' ? false : data.addIfNotFound;
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetTermsByLabel xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
           <label>${data.label}</label>
           <lcid>${data.lcid}</lcid>
@@ -231,20 +231,20 @@ export class MMD {
       </GetTermsByLabel>
   `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return this.utils.parseXml(
         result['soap:Envelope']['soap:Body'][0]
           .GetTermsByLabelResponse[0].GetTermsByLabelResult[0]
       );
-    }).then(terms => {
+    }).then((terms) => {
       return this.mapTermsFromSoapResponse(terms.TermStore.T);
     }) as any;
   }
@@ -259,7 +259,7 @@ export class MMD {
 
     data.lcid = data.lcid || 1033;
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <GetKeywordTermsByGuids xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
         <termIds>
             ${
@@ -283,20 +283,20 @@ export class MMD {
       </GetKeywordTermsByGuids>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return this.utils.parseXml(
         result['soap:Envelope']['soap:Body'][0]
           .GetKeywordTermsByGuidsResponse[0].GetKeywordTermsByGuidsResult[0]
       );
-    }).then(terms => {
+    }).then((terms) => {
       return this.mapTermsFromSoapResponse(terms.TermStore.T);
     }) as any;
   }
@@ -309,7 +309,7 @@ export class MMD {
       throw new Error('Site URL should be defined');
     }
 
-    data.newTerms = data.newTerms.map(term => {
+    data.newTerms = data.newTerms.map((term) => {
       return {
         ...term,
         parentTermId: term.parentTermId || '00000000-0000-0000-0000-000000000000'
@@ -318,7 +318,7 @@ export class MMD {
 
     data.lcid = data.lcid || 1033;
 
-    let soapBody: string = this.utils.soapEnvelope(`
+    const soapBody: string = this.utils.soapEnvelope(`
       <AddTerms xmlns="http://schemas.microsoft.com/sharepoint/taxonomy/soap/">
         <sharedServiceId>${data.sspId}</sharedServiceId>
         <termSetId>${data.termSetId}</termSetId>
@@ -342,20 +342,20 @@ export class MMD {
       </AddTerms>
     `);
 
-    let headers: any = this.utils.soapHeaders(soapBody);
+    const headers: any = this.utils.soapHeaders(soapBody);
 
     return this.request.post(`${data.baseUrl}/_vti_bin/TaxonomyClientService.asmx`, {
       headers,
       body: soapBody,
       json: false
-    }).then(response => {
+    }).then((response) => {
       return this.utils.parseXml(response.body);
-    }).then(result => {
+    }).then((result) => {
       return this.utils.parseXml(
         result['soap:Envelope']['soap:Body'][0]
           .AddTermsResponse[0].AddTermsResult[0]
       );
-    }).then(terms => {
+    }).then((terms) => {
       return this.mapTermsFromSoapResponse(terms.TermStore.T);
     }) as any;
   }
@@ -372,7 +372,7 @@ export class MMD {
 
     data.properties = data.properties || [];
 
-    let requestBody: string = this.utils.trimMultiline(`
+    const requestBody: string = this.utils.trimMultiline(`
       <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
         <Actions>
           <Query Id="78" ObjectPathId="76">
@@ -426,16 +426,16 @@ export class MMD {
     `);
 
     return this.request.requestDigest(data.baseUrl)
-      .then(digest => {
+      .then((digest) => {
 
-        let headers: any = this.utils.csomHeaders(requestBody, digest);
+        const headers: any = this.utils.csomHeaders(requestBody, digest);
 
         return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
           headers,
           body: requestBody,
           json: false
-        }).then(response => {
-          let result: any = JSON.parse(response.body);
+        }).then((response) => {
+          const result: any = JSON.parse(response.body);
           if (result[0].ErrorInfo !== null) {
             throw new Error(JSON.stringify(result[0].ErrorInfo));
           }
@@ -452,7 +452,7 @@ export class MMD {
       throw new Error('Site URL should be defined');
     }
 
-    let requestBody: string = this.utils.trimMultiline(`
+    const requestBody: string = this.utils.trimMultiline(`
       <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
         <Actions>
           <SetProperty Id="166" ObjectPathId="157" Name="Name">
@@ -482,16 +482,16 @@ export class MMD {
     `);
 
     return this.request.requestDigest(data.baseUrl)
-      .then(digest => {
+      .then((digest) => {
 
-        let headers: any = this.utils.csomHeaders(requestBody, digest);
+        const headers: any = this.utils.csomHeaders(requestBody, digest);
 
         return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
           headers,
           body: requestBody,
           json: false
-        }).then(response => {
-          let result: any = JSON.parse(response.body);
+        }).then((response) => {
+          const result: any = JSON.parse(response.body);
           if (result[0].ErrorInfo !== null) {
             throw new Error(JSON.stringify(result[0].ErrorInfo));
           }
@@ -510,7 +510,7 @@ export class MMD {
 
     data.deprecate = typeof data.deprecate === 'undefined' ? true : data.deprecate;
 
-    let requestBody: string = this.utils.trimMultiline(`
+    const requestBody: string = this.utils.trimMultiline(`
       <Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" SchemaVersion="15.0.0.0" LibraryVersion="15.0.0.0" ApplicationName="Javascript Library">
         <Actions>
           <Method Name="Deprecate" Id="41" ObjectPathId="32">
@@ -542,20 +542,20 @@ export class MMD {
     `);
 
     return this.request.requestDigest(data.baseUrl)
-      .then(digest => {
+      .then((digest) => {
 
         if (typeof data.deprecate === 'undefined') {
           data.deprecate = true;
         }
 
-        let headers: any = this.utils.csomHeaders(requestBody, digest);
+        const headers: any = this.utils.csomHeaders(requestBody, digest);
 
         return this.request.post(`${data.baseUrl}/_vti_bin/client.svc/ProcessQuery`, {
           headers,
           body: requestBody,
           json: false
-        }).then(response => {
-          let result: any = JSON.parse(response.body);
+        }).then((response) => {
+          const result: any = JSON.parse(response.body);
           if (result[0].ErrorInfo !== null) {
             throw new Error(JSON.stringify(result[0].ErrorInfo));
           }
@@ -578,7 +578,7 @@ export class MMD {
   }
 
   private mapTermsFromSoapResponse = (soap: any[] = []): ITerm[] => {
-    return soap.map(t => {
+    return soap.map((t) => {
       return {
         name: t.LS[0].TL[0].$.a32,
         id: t.$.a9,
