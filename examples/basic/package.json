@@ -4,18 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "index": "ts-node ./index"
+    "index": "ts-node ./index",
+    "snyk-protect": "snyk protect",
+    "prepare": "yarn run snyk-protect"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "sp-screwdriver": "^1.1.0"
+    "sp-screwdriver": "^1.1.0",
+    "snyk": "^1.320.2"
   },
   "devDependencies": {
     "@types/node": "^13.9.3",
     "ts-node": "^8.8.1",
     "tslint": "^6.1.0",
     "typescript": "^3.8.3"
-  }
+  },
+  "snyk": true
 }
