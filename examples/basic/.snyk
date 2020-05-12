@@ -1,0 +1,10 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - sp-screwdriver > node-sp-auth > node-sp-auth-config > node-sp-auth > lodash:
+        patched: '2020-05-12T21:36:48.814Z'
+    - sp-screwdriver > node-sp-auth > node-sp-auth-config > node-sp-auth > request-promise > request-promise-core > lodash:
+        patched: '2020-05-12T21:36:48.814Z'
